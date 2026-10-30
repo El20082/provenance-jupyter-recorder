@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="brand/exports/lockup-dark.png" />
+  <img alt="Provenance for JupyterLab" src="brand/exports/lockup-light.png" width="440" />
+</picture>
+
 # provenance-jupyter-recorder
 
 A JupyterLab extension that records a tamper-evident Provenance log (`.slog`) while a
