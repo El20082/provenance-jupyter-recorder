@@ -1,0 +1,3 @@
+[submodule "vendor/provenance"]
+	path = vendor/provenance
+	url = https://github.com/ProvenanceTools/provenance.git
