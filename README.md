@@ -9,7 +9,7 @@ Its bundles are designed to be format-compatible with the other recorders, so th
 analyzer, validation checks and heuristics can read them.
 
 > **Status: skeleton only. Nothing is implemented and the project does not build yet.**
-> Each source file is a stub describing its job. `package.json` and `pyproject.toml`
+> Each source and test file is a stub describing its job. `package.json` and `pyproject.toml`
 > declare no dependencies, and `log-core` is not wired in. See
 > [Open decisions](#open-decisions).
 
@@ -174,49 +174,59 @@ the in-scope submission files at their assignment-relative paths.
 
 ## Repository layout
 
-One pip package is planned to ship both the prebuilt frontend and the server extension.
-Check file names against the current official JupyterLab extension template before
-adding the real build. Frontend unit tests will sit beside each source file as `*.test.ts`.
+This follows the sibling repos: the same `recorder/` folders as `provnvim` and `provjet`,
+a `tests/` tree mirroring the source, `docs/design.md`, and gates that use the real
+analyzer. The Python side uses the gateway's conventions (subpackages, `ports.py`,
+`py.typed`, hatchling, ruff, mypy, pytest). It sits at the repo root rather than under
+`src/` because `src/` holds the frontend, as JupyterLab extensions normally do.
+
+There is no format port. `src/core/` is only the single import site for `log-core`.
 
 ```
 provenance-jupyter-recorder/
-├── README.md
-├── CLAUDE.md                         # conventions; mirrors the monorepo's rules
-├── LICENSE                           # Apache-2.0, matching the monorepo
-├── THIRD-PARTY-NOTICES.txt
-├── package.json                      # frontend package, build scripts
-├── tsconfig.json
-├── pyproject.toml                    # pip package: frontend + server extension
-├── install.json                      # JupyterLab extension metadata
-├── jupyter-config/server-config/     # auto-enables the server extension
-├── schema/plugin.json                # settings + command palette entries
-├── style/index.css                   # status-bar item
-├── vendor/                           # planned submodule → ProvenanceTools/provenance
+├── README.md  CLAUDE.md  LICENSE  NOTICE  THIRD-PARTY-NOTICES.txt  Makefile
+├── package.json  tsconfig.json  pyproject.toml  install.json
+├── brand/                      # brand notes
+├── deploy/jupyterhub/          # hub deployment guide
+├── docs/                       # design, manual checks, student guide, releasing, plans
+├── jupyter-config/             # auto-enables the server extension
+├── schema/  style/             # JupyterLab settings and styles
+├── scripts/                    # analyzer verification and e2e
+├── vendor/                     # planned log-core submodule
 │
-├── src/                              # FRONTEND (TypeScript)
-│   ├── index.ts                      # plugin entry
-│   ├── activation/                   # manifest discovery + verification, root key, status bar
-│   ├── session/                      # registry, session host, session.start, tab ownership
-│   ├── notebook/                     # text view, offset map, notebook signal wiring
-│   ├── editor/                       # plain text files in the file editor
-│   ├── events/                       # paste signals, heartbeat, clock, focus, explanation tags
-│   ├── state/                        # expected-content model
-│   ├── wiring/                       # external changes, terminals, extension snapshot
-│   ├── io/                           # ordered log append, atomic writes via the server
-│   ├── identity/                     # secret storage, session countersignature
-│   └── commands/                     # seal, enrollment
+├── src/                        # FRONTEND (TypeScript)
+│   ├── index.ts                # plugin entry
+│   ├── core/                   # single import site for log-core
+│   ├── notebook/               # text view, offset map, cell deltas
+│   └── recorder/
+│       ├── activation/         # manifest discovery + verification, status
+│       ├── commands/           # seal, enrollment, extension hash
+│       ├── events/             # pure payload builders, paste signals, heartbeat
+│       ├── failure/            # disk-full and degraded mode
+│       ├── identity/           # secret store, session identity, enroll nudge
+│       ├── io/                 # session/meta/rolling-seal writers via the server
+│       ├── session/            # host, registry, checkpoints, policy, tab ownership
+│       ├── startup/            # chain recovery, slog ownership
+│       ├── state/              # expected-content model
+│       ├── watch/              # external changes, peer witnessing
+│       └── wiring/             # JupyterLab signals to events
 │
-├── provenance_jupyter_recorder/      # SERVER EXTENSION (Python); moves bytes only
-│   ├── __init__.py                   # Jupyter entry points
-│   ├── handlers.py                   # REST endpoints
-│   ├── slog_io.py                    # ordered append, write-temp-then-rename
-│   ├── watcher.py                    # on-disk change detection
-│   ├── extension_hash.py             # tree hash (conformance-gated)
-│   ├── paths.py                      # confine paths to the assignment root
-│   └── tests/
+├── provjup/                    # SERVER EXTENSION (Python); moves bytes only
+│   ├── api/                    # REST handlers
+│   ├── fs/                     # path confinement, append, atomic write, walk
+│   ├── watch/                  # on-disk change detection
+│   ├── git/                    # raw git facts
+│   ├── extension/              # extension_hash, installed extensions
+│   ├── identity/               # secret storage
+│   ├── config.py  ports.py
+│   └── py.typed
 │
-├── ui-tests/                         # end to end in a real JupyterLab
-└── conformance/seal-gate.test.ts     # real bundle → monorepo loadBundle + runValidation
+├── tests/
+│   ├── conformance/            # vectors from the monorepo (make vectors)
+│   ├── gates/                  # real bundle through the real analyzer
+│   ├── core/  notebook/  recorder/   # mirrors src/
+│   └── server/                 # mirrors provjup/
+└── ui-tests/                   # end to end in a real JupyterLab
 ```
 
 ---
@@ -273,9 +283,10 @@ dependencies are approved and the real build exists.
 
 1. **Outputs and execution:** confirm they stay out of scope (current design assumes yes).
 2. **Deployment target:** remote JupyterHub (Berkeley DataHub) vs local Jupyter.
-3. **Student secret storage:** OS keyring with a file fallback (local), vs a file in
-   the hub home directory (conflicts with key-management §4.4 "never leaves the
-   student's machine").
+3. **Student secret storage:** the `provnvim` precedent is a `0600` file outside every
+   workspace, and the VS Code and `provjet` precedent is an OS vault. On a hub, a file
+   sits on university storage, which conflicts with key-management §4.4 "never leaves
+   the student's machine".
 4. **Submission path:** a separate bundle upload, or included in Otter's
    `grader.export` zip (needs an ingest adapter).
 5. **VS Code notebooks:** whether to fix the monorepo recorder's notebook gap using
