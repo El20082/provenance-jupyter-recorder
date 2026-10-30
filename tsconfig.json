@@ -7,5 +7,8 @@
     "moduleResolution": "bundler",
     "skipLibCheck": true
   },
-  "include": ["src", "conformance"]
+  "include": [
+    "src",
+    "tests"
+  ]
 }

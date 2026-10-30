@@ -1,9 +1,32 @@
-# Skeleton only. The build system and dependencies are added once approved.
+# Skeleton only. Dependencies and the labextension build hook are added once approved.
 [project]
-name = "provenance-jupyter-recorder"
+name = "provjup"
 version = "0.0.0"
 description = "JupyterLab recorder for Provenance."
 readme = "README.md"
-license = { text = "Apache-2.0" }
-requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.11"
 dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["provjup"]
+
+[tool.ruff]
+line-length = 100
+src = [".", "tests/server"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["provjup"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/server"]

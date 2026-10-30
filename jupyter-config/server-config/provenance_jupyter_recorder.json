@@ -1,7 +1,0 @@
-{
-  "ServerApp": {
-    "jpserver_extensions": {
-      "provenance_jupyter_recorder": true
-    }
-  }
-}

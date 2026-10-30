@@ -1,0 +1,6 @@
+Provenance Recorder for JupyterLab
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+JupyterLab and Jupyter Server are separate works, used as the host runtime and
+not redistributed by this project.

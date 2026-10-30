@@ -1,15 +1,19 @@
 {
-  "name": "provenance-jupyter-recorder",
+  "name": "provjup",
   "version": "0.0.0",
   "private": true,
   "description": "JupyterLab recorder for Provenance. Skeleton only.",
   "license": "Apache-2.0",
   "type": "module",
   "main": "lib/index.js",
-  "files": ["lib/**/*", "schema/**/*", "style/**/*"],
+  "files": [
+    "lib/**/*",
+    "schema/**/*",
+    "style/**/*"
+  ],
   "jupyterlab": {
     "extension": true,
     "schemaDir": "schema",
-    "outputDir": "provenance_jupyter_recorder/labextension"
+    "outputDir": "provjup/labextension"
   }
 }
