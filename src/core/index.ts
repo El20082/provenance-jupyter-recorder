@@ -4,4 +4,22 @@
  * TODO: not implemented. See docs/design.md.
  */
 
-export {};
+import { sha256Hex } from '@provenance/log-core';
+
+export {
+  sha256Hex,
+  chainEntry,
+  serializeEntry,
+  GENESIS_PREV_HASH,
+  generateSessionKeypair,
+  signCheckpoint,
+} from '@provenance/log-core';
+
+export type {
+  Envelope,
+  EventKind,
+  EventPayload,
+  DocOpenPayload,
+  DocChangePayload,
+  DocSavePayload,
+} from '@provenance/log-core';

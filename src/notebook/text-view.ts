@@ -4,4 +4,16 @@
  * TODO: not implemented. See docs/design.md.
  */
 
-export {};
+export interface CellSource {
+  id: string;
+  cell_type: 'code' | 'markdown' | 'raw';
+  source: string;
+}
+
+export function textView(cells: readonly CellSource[]): string {
+  return cells
+    .map(cell =>
+      `# %% [${cell.cell_type}] id=${cell.id}\n${cell.source}\n`
+    )
+    .join('');
+}

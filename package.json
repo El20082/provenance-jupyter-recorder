@@ -15,5 +15,9 @@
     "extension": true,
     "schemaDir": "schema",
     "outputDir": "provjup/labextension"
+  },
+
+  "dependencies": {
+  "@provenance/log-core": "file:vendor/provenance/packages/log-core"
   }
 }
