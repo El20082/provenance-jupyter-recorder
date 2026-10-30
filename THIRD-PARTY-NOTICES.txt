@@ -1,0 +1,1 @@
+No third-party code is vendored yet. Add an entry here in the same commit as any vendored component.

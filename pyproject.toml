@@ -1,0 +1,9 @@
+# Skeleton only. The build system and dependencies are added once approved.
+[project]
+name = "provenance-jupyter-recorder"
+version = "0.0.0"
+description = "JupyterLab recorder for Provenance."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+dependencies = []

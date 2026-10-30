@@ -1,0 +1,5 @@
+{
+  "packageManager": "python",
+  "packageName": "provenance-jupyter-recorder",
+  "uninstallInstructions": "Use your Python package manager to uninstall provenance-jupyter-recorder"
+}

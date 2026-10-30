@@ -1,0 +1,8 @@
+node_modules/
+lib/
+dist/
+*.tsbuildinfo
+__pycache__/
+*.egg-info/
+.ipynb_checkpoints/
+provenance_jupyter_recorder/labextension/
