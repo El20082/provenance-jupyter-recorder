@@ -1,6 +1,8 @@
 # Design: Provenance JupyterLab Recorder (`provjup`)
 
-Draft. Sections follow `docs/design.md` in `provnvim` and `provjet`. Items marked
+Draft. The VS Code recorder (`packages/recorder`) is the main reference for building
+this repo; `provnvim` and `provjet` are consulted only where it has no equivalent. Sections
+follow `docs/design.md` in `provnvim` and `provjet`. Items marked
 **open** need a decision before implementation.
 
 ## 1. What this is
@@ -15,6 +17,13 @@ In: notebooks and text files in JupyterLab and Notebook 7, activated by a verifi
 manifest.
 
 Out: cell outputs, execution history, VS Code notebooks, Colab.
+
+**Deployment:** Berkeley DataHub first, piloted on Data 100, then Data 101 and Data 102, with `provjup` in the
+course image. Local Jupyter is a v1 demo, not full support.
+
+**Student workflow:** students install the extension, enroll once, and create the zip with
+Otter. There is no Prepare Submission Bundle command; the rolling seal travels in
+`.provenance/` inside Otter's zip.
 
 ## 3. The runtime strategy
 
@@ -46,7 +55,7 @@ Notebooks use the `ipynb-source-v1` text view defined in the README.
 | External change | `FileChangedShell`, `:checktime`, `uv` watcher | VFS refresh on focus | Server watcher, reload and save-time checks |
 | Terminal | Terminal autocmds | Terminal plugin | JupyterLab terminals |
 | Git | `git` CLI probe | Git4Idea | Server probe reports raw facts |
-| Secrets | `0600` file in `stdpath("data")` | PasswordSafe | **Open** (§12) |
+| Secrets | `0600` file in `stdpath("data")` | PasswordSafe | `0600` file in the Jupyter data directory (§12) |
 | Peer witnessing | `uv` watcher on `.provenance/` | VFS listener | Server watcher on `.provenance/` |
 
 Jupyter-specific risks: edits from real-time collaborators, the same notebook in two
@@ -93,7 +102,9 @@ It has its own runtime, packaging and release cycle, as `provjet` and `provnvim`
 
 ## 12. Open questions
 
-See "Open decisions" in the README. Secret storage has two precedents: a vault
-(VS Code, `provjet`) and a `0600` file outside every workspace (`provnvim`). A `0600`
-file in the Jupyter data directory fits local use. On a hub it sits on university storage
-instead of the student's machine, which still needs a decision.
+See "Open decisions" in the README.
+
+Secret storage is decided. The master secret stays in the student's home directory at rest,
+in a `0600` file in the Jupyter data directory, because a hub has no OS vault. This replaces
+"never leaves the student's machine" from monorepo key-management §4.4 for `provjup`, and
+the file must stay outside every assignment folder.
