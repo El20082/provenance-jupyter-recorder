@@ -77,7 +77,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | B2 | Settle text-view edge cases: notebooks before format 4.5, `\r\n` in cells, cell-boundary lookalike lines | Monorepo owner, then you | Notebooks without cell ids are not recorded at all |
 | B3 | Decision 7: shared VS Code helpers | You | **Resolved 2026-11-13 (option D):** imported from the submodule like log-core (#52) |
 | B4 | Confirm the JupyterLab packages added for the build | You | **Resolved 2026-11-13:** all confirmed (`application`, `builder`, `services`, `coreutils`, `notebook`, `fileeditor`, and the Python build tools) |
-| B5 | Wire up `style/` or delete it | You | Unwired, which is harmless until Task 4 |
+| B5 | `style/` | You | **Resolved 2026-11-13:** `style/`, the unused settings schema and `ui-tests/` removed (#53) |
 | B6 | Approve Python dev tools: `pytest`, `ruff`, `mypy` | You | **Resolved 2026-11-13** |
 | B7 | Land the approved `'jupyterlab'` value in log-core's `HostInfo.editor` | Monorepo owner | `session.start` uses the older `vscode` block; the analyzer cannot tell a JupyterLab session from a VS Code one |
 

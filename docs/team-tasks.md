@@ -315,7 +315,9 @@ for example a `BroadcastChannel` lock.
 **7.7 Degraded mode and status item.** Report a failed disk or write without stopping recording,
 and show a "Provenance: recording" status item.
 - Files: `src/recorder/failure/*`, `src/recorder/activation/status-bar.ts`, `recorder-state.ts`
-  (stubs). Needs `@jupyterlab/statusbar` (dependency approval) and decision B5 on `style/`.
+  (stubs). Needs `@jupyterlab/statusbar` (dependency approval). Build the item from code with
+  JupyterLab's status-bar styling and theme variables; `style/` was removed (#53) and comes back only
+  if the item truly needs CSS.
 - VS Code: `failure/disk-full-handler.ts`, `activation/status-bar.ts`.
 
 **7.8 Remove the seal-command stubs.** Delete `src/recorder/commands/seal.ts`,
@@ -356,7 +358,9 @@ JupyterLab's installed extensions. `src/recorder/wiring/snapshot-wiring.ts`,
 
 ### Task 9: Real-world testing and release
 
-**9.1 End-to-end test in real JupyterLab.** `scripts/e2e/run_e2e.sh` and `ui-tests/`
+**9.1 End-to-end test in real JupyterLab.** `scripts/e2e/run_e2e.sh`. Choose between Galata
+(JupyterLab's Playwright-based tool; needs dependency approval, and recreates `ui-tests/`, removed in
+#53) and the dependency-free Chrome DevTools Protocol script used in Tasks 4 and 5
 (Playwright with Galata needs dependency approval). Produce a real two-session bundle and pass it
 through `scripts/verify-bundle-with-analyzer.mjs`. The Task 4 log describes a manual version of
 this check.
@@ -409,6 +413,5 @@ These are for the project owner, but anyone can help draft them.
 | --- | --- | --- |
 | B1 | Approve the notebook `view` field and format | Monorepo owner |
 | B2 | Text-view edge cases: notebooks before format 4.5, `\r\n` | Monorepo owner, then project owner |
-| B5 | Wire up `style/` or delete it | Project owner |
 | B7 | Land `'jupyterlab'` in `HostInfo.editor` | Monorepo owner |
 | — | `NOTICE` copyright holder | Project owner |
