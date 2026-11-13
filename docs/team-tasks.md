@@ -49,9 +49,9 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 | ID | Task | Size | Depends on | Blocked by | Owner |
 | --- | --- | --- | --- | --- | --- |
 | **2** | **Analyzer and monorepo changes: a separate big task, see below** | **L** | — | **Monorepo owner** | |
-| 5.1 | Route paths to sessions | S | — | — | **Done** (PR #10) |
-| 5.2 | Connect notebook edits to the recorder | M | 5.1 | — | **Done** (PR #10) |
-| 5.3 | Record plain text files | M | 5.1 | — | **Done** (PR #10) |
+| 5.1 | Route paths to sessions | S | — | — | **Done** (Task 5 PR) |
+| 5.2 | Connect notebook edits to the recorder | M | 5.1 | — | **Done** (Task 5 PR) |
+| 5.3 | Record plain text files | M | 5.1 | — | **Done** (Task 5 PR) |
 | 6.1 | Heartbeats that survive hidden tabs | M | — | — | |
 | 6.2 | Focus and selection events | S | 5.2, 5.3 | — | |
 | 6.3 | Paste detection | L | 5.2, 5.3 | Decision 7 | |
