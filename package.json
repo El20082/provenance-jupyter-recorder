@@ -7,9 +7,7 @@
   "type": "module",
   "main": "lib/index.js",
   "files": [
-    "lib/**/*",
-    "schema/**/*",
-    "style/**/*"
+    "lib/**/*"
   ],
   "scripts": {
     "build:core": "tsc -p tsconfig.log-core.json",
@@ -26,7 +24,6 @@
   },
   "jupyterlab": {
     "extension": true,
-    "schemaDir": "schema",
     "outputDir": "provjup/labextension"
   },
   "dependencies": {

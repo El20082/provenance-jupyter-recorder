@@ -204,7 +204,6 @@ provenance-jupyter-recorder/
 ├── deploy/jupyterhub/          # hub deployment guide
 ├── docs/                       # design, manual checks, student guide, releasing, plans
 ├── jupyter-config/             # auto-enables the server extension
-├── schema/  style/             # JupyterLab settings and styles
 ├── scripts/                    # analyzer verification and e2e
 ├── vendor/                     # planned log-core submodule
 │
@@ -235,12 +234,11 @@ provenance-jupyter-recorder/
 │   ├── config.py  ports.py
 │   └── py.typed
 │
-├── tests/
-│   ├── conformance/            # vectors from the monorepo (make vectors)
-│   ├── gates/                  # real bundle through the real analyzer
-│   ├── core/  notebook/  recorder/   # mirrors src/
-│   └── server/                 # mirrors provjup/
-└── ui-tests/                   # end to end in a real JupyterLab
+└── tests/
+    ├── conformance/            # vectors from the monorepo (make vectors)
+    ├── gates/                  # real bundle through the real analyzer
+    ├── core/  notebook/  recorder/   # mirrors src/
+    └── server/                 # mirrors provjup/
 ```
 
 ---
