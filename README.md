@@ -311,7 +311,8 @@ dependencies are approved and the real build exists.
 4. **Submission path (decided):** `.provenance/` inside Otter's zip, submitted to Gradescope.
 5. **VS Code notebooks:** whether to fix the monorepo recorder's notebook gap using
    the same text view.
-6. **Real-time collaboration:** filter edits from other users, or require it disabled.
+6. **Real-time collaboration (decided):** must be off for v1; the recorder refuses to record while it is
+   on. Group work is a separate project later.
 7. **Shared helpers:** copy the VS Code pure modules, or upstream them into a package.
 8. **`log-core` delivery (decided):** a git submodule of the monorepo at `vendor/provenance`.
 9. **Honeypot matching:**

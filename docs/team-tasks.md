@@ -52,6 +52,7 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 | 5.1 | Route paths to sessions | S | — | — | — (done in the Task 5 PR) |
 | 5.2 | Connect notebook edits to the recorder | M | 5.1 | — | — (done in the Task 5 PR) |
 | 5.3 | Record plain text files | M | 5.1 | — | — (done in the Task 5 PR) |
+| 5.4 | Refuse to record while real-time collaboration is on (decision 6) | S | 5.2 | — | #51 |
 | 6.1 | Heartbeats that survive hidden tabs | M | — | — | #22 |
 | 6.2 | Focus and selection events | S | 5.2, 5.3 | — | #23 |
 | 6.3 | Paste detection | L | 5.2, 5.3 | Decision 7 | #24 |
@@ -374,5 +375,4 @@ These are for the project owner, but anyone can help draft them.
 | B3 / Decision 7 | Copy VS Code helpers or share them | Project owner |
 | B5 | Wire up `style/` or delete it | Project owner |
 | B7 | Land `'jupyterlab'` in `HostInfo.editor` | Monorepo owner |
-| Decision 6 | Real-time collaboration: require it off for v1? | Project owner |
 | — | `NOTICE` copyright holder | Project owner |

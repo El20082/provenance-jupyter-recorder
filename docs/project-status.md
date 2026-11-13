@@ -95,6 +95,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | 12 | Data 100 is the first pilot |
 | 13 | Vitest, ESLint and Prettier |
 | 14 | `watchdog` for file watching, with a slow polling safety net |
+| 6 | Real-time collaboration must be off for v1; the recorder refuses to record while it is on (#51). Group work is a separate project later |
 | 15 | The analyzer shows replayed notebooks with JupyterLab's own notebook components, embedded in its replay view the way Monaco is |
 | 1, 10 | Record each cell run as a new `cell.execute` event, with a digest of its outputs, never their content |
 | — | Students install, enroll once, and create the Otter zip. Nothing else |
@@ -108,7 +109,6 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 
 | # | Decision | Recommendation |
 | --- | --- | --- |
-| 6 | Real-time collaboration | Require it disabled for v1 |
 | 7 | Shared VS Code helpers | Move them into a shared package if the monorepo owner agrees |
 | 9 | Honeypot matching | After v1 |
 | 5 | Fix VS Code's own notebook gap | Separate work; blocks nothing here |

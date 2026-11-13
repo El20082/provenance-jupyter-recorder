@@ -61,7 +61,8 @@ Notebooks use the `ipynb-source-v1` text view defined in the README.
 | Secrets | `0600` file in `stdpath("data")` | PasswordSafe | `0600` file in the Jupyter data directory (§12) |
 | Peer witnessing | `uv` watcher on `.provenance/` | VFS listener | Server watcher on `.provenance/` |
 
-Jupyter-specific risks: edits from real-time collaborators, the same notebook in two
+Jupyter-specific risks: edits from real-time collaborators (decided: collaboration must be off for v1, and the
+recorder refuses to record while it is on; group work is a separate project later), the same notebook in two
 tabs, hub idle shutdown, and `%load` or `!cmd` changing files.
 
 ## 6. Producer identity
