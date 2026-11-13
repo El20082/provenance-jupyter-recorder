@@ -49,9 +49,9 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 | ID | Task | Size | Depends on | Blocked by | Owner |
 | --- | --- | --- | --- | --- | --- |
 | **2** | **Analyzer and monorepo changes: a separate big task, see below** | **L** | — | **Monorepo owner** | |
-| 5.1 | Route paths to sessions | S | — | — | |
-| 5.2 | Connect notebook edits to the recorder | M | 5.1 | — | |
-| 5.3 | Record plain text files | M | 5.1 | — | |
+| 5.1 | Route paths to sessions | S | — | — | **Done** (PR #10) |
+| 5.2 | Connect notebook edits to the recorder | M | 5.1 | — | **Done** (PR #10) |
+| 5.3 | Record plain text files | M | 5.1 | — | **Done** (PR #10) |
 | 6.1 | Heartbeats that survive hidden tabs | M | — | — | |
 | 6.2 | Focus and selection events | S | 5.2, 5.3 | — | |
 | 6.3 | Paste detection | L | 5.2, 5.3 | Decision 7 | |
@@ -132,7 +132,7 @@ Outreach that is not code is at the end.
 Paths under `src/` and `provjup/` are this repo; "VS Code:" paths are under the monorepo's
 `packages/recorder/src/`. Files marked *stub* exist and say "TODO: not implemented".
 
-### Task 5: Edits
+### Task 5: Edits — done 2026-11-13, see [`plans/2026-11-13-task-5-edits.md`](plans/2026-11-13-task-5-edits.md)
 
 **5.1 Route paths to sessions.** Decide which session, if any, owns a file path, and turn it into
 an assignment-relative path. Drop anything outside a verified root, plus `.provenance/` itself.
