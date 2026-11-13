@@ -144,3 +144,22 @@ describe('NotebookWiring output is a valid Provenance log', () => {
     expect((save.data as { sha256: string }).sha256).toBe(sha256Hex(view));
   });
 });
+
+describe('NotebookWiring resynchronization', () => {
+  it('skips a change it already has, and replaces a cell whose change does not line up', () => {
+    const { entries, wiring } = setup();
+    wiring.opened('hw.ipynb', cells);
+    wiring.sourceChanged('hw.ipynb', 'a', [{ retain: 5 }, { insert: '0' }], 'x = 1');
+    expect(entries).toHaveLength(1);
+    wiring.sourceChanged('hw.ipynb', 'a', [{ insert: 'wrong' }], 'x = 10');
+    wiring.sourceChanged('hw.ipynb', 'b', null, '## Q3');
+    let view = (entries[0]!.data as { content: string }).content;
+    for (const e of entries.slice(1)) view = applyDeltas(view, (e.data as DocChangePayload).deltas);
+    expect(view).toBe(
+      textView([
+        { id: 'a', cell_type: 'code', source: 'x = 10' },
+        { id: 'b', cell_type: 'markdown', source: '## Q3' },
+      ]),
+    );
+  });
+});

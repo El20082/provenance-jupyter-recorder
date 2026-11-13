@@ -16,7 +16,7 @@ import { cellBlock, cellHeader, type CellSource } from './text-view';
  */
 export type SourceOp = { retain: number } | { insert: string } | { delete: number };
 
-interface Edit {
+export interface Edit {
   /** Offset into the OLD source. */
   at: number;
   deleteCount: number;
@@ -24,7 +24,7 @@ interface Edit {
 }
 
 /** Collapse ops into non-overlapping edits against the old source, in ascending order. */
-function editsFromOps(ops: readonly SourceOp[]): Edit[] {
+export function editsFromOps(ops: readonly SourceOp[]): Edit[] {
   const edits: Edit[] = [];
   let at = 0;
   for (const op of ops) {

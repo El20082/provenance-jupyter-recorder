@@ -5,8 +5,8 @@
  * doc.change of view deltas, doc.save carries the hash of the saved view, and doc.close
  * ends the document. Every event goes through the SessionHost, so it is chained.
  *
- * The JupyterLab side (ISharedNotebook / ISharedCell signals) calls these methods; it is
- * wired in a later task. Everything here is synchronous and does no I/O.
+ * `jupyter-documents.ts` calls these methods from JupyterLab's shared-model signals.
+ * Everything here is synchronous and does no I/O.
  *
  * Not here, by design:
  * - paste, selection, focus and heartbeat events: their own modules, in Task 6;
@@ -14,8 +14,7 @@
  * - cell execution and kernel events: not part of the format (decisions 1 and 10).
  */
 
-import { sha256Hex } from '../../core/index';
-import type { DocChangeDelta, DocOpenPayload } from '../../core/index';
+import type { DocChangeDelta } from '../../core/index';
 import {
   cellListDeltas,
   applySourceOps,
@@ -25,14 +24,10 @@ import {
 import { OffsetMap } from '../../notebook/offset-map';
 import { checkCells, textView, type CellSource, type ViewProblem } from '../../notebook/text-view';
 import { viewOfSavedNotebook } from '../../notebook/view-save';
+import { docOpenPayload } from '../events/doc-events';
 import type { SessionHost } from '../session/session-host';
 
-/**
- * doc.open inlines content up to this many UTF-8 bytes, as the VS Code recorder does
- * (`inline-content-limits.ts`). Copied, not imported: whether shared recorder helpers move
- * into a package is open decision 7.
- */
-export const MAX_INLINE_BYTES = 64 * 1024;
+export { MAX_INLINE_BYTES } from '../events/doc-events';
 
 export type OpenResult = { ok: true } | { ok: false; reason: ViewProblem | 'already_open' };
 
@@ -59,28 +54,43 @@ export class NotebookWiring {
     const copy = cells.map((cell) => ({ ...cell }));
     this.open.set(path, { cells: copy, map: new OffsetMap(copy) });
 
-    const view = textView(copy);
-    const payload: DocOpenPayload = {
-      path,
-      sha256: sha256Hex(view),
-      line_count: view.split('\n').length,
-    };
-    if (new TextEncoder().encode(view).length <= MAX_INLINE_BYTES) payload.content = view;
-    else payload.truncated = true;
-    this.host.emit('doc.open', payload);
+    this.host.emit('doc.open', docOpenPayload(path, textView(copy)));
     return { ok: true };
   }
 
-  /** A cell's source changed. `ops` is the Yjs-format delta of that change. */
-  sourceChanged(path: string, cellId: string, ops: readonly SourceOp[]): void {
+  /**
+   * A cell's source changed. `ops` is the Yjs-format delta of that change.
+   *
+   * `currentSource`, when given, is the cell's source after the change, read from the shared
+   * model. It guards against signals arriving in an unexpected order: a change this wiring
+   * has already absorbed (through `cellsChanged`) is skipped, and one that does not line up
+   * becomes a single edit setting the cell to `currentSource`. Either way the recorded view
+   * stays exact. `ops` of `null` means the delta could not be read, so only the whole-cell
+   * edit is possible.
+   */
+  sourceChanged(
+    path: string,
+    cellId: string,
+    ops: readonly SourceOp[] | null,
+    currentSource?: string,
+  ): void {
     const notebook = this.open.get(path);
     if (notebook === undefined) return;
     const index = notebook.cells.findIndex((cell) => cell.id === cellId);
     const cell = notebook.cells[index];
     if (cell === undefined) return;
+    if (currentSource !== undefined && cell.source === currentSource) return;
 
-    const deltas = sourceEditDeltas(notebook.map, index, cell.source, ops);
-    cell.source = applySourceOps(cell.source, ops);
+    let effective = ops;
+    if (
+      effective === null ||
+      (currentSource !== undefined && applySourceOps(cell.source, effective) !== currentSource)
+    ) {
+      if (currentSource === undefined) return;
+      effective = [{ delete: cell.source.length }, { insert: currentSource }];
+    }
+    const deltas = sourceEditDeltas(notebook.map, index, cell.source, effective);
+    cell.source = applySourceOps(cell.source, effective);
     notebook.map.updateCell(index, cell.source);
     this.emitChange(path, deltas);
   }
