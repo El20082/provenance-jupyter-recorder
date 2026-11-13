@@ -76,7 +76,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | B1 | Approve the `view` field and the `ipynb-source-v1` format | Monorepo owner | The analyzer treats a notebook as a plain file; not usable by students |
 | B2 | Settle text-view edge cases: notebooks before format 4.5, `\r\n` in cells, cell-boundary lookalike lines | Monorepo owner, then you | Notebooks without cell ids are not recorded at all |
 | B3 | Decision 7: copy shared VS Code helpers or share them | You | Two small copies exist and could drift |
-| B4 | Confirm the dependencies added for the build, including `@jupyterlab/services` and `@jupyterlab/coreutils` from Task 4 | You | Already added |
+| B4 | Confirm the JupyterLab packages added for the build | You | **Resolved 2026-11-13:** all confirmed (`application`, `builder`, `services`, `coreutils`, `notebook`, `fileeditor`, and the Python build tools) |
 | B5 | Wire up `style/` or delete it | You | Unwired, which is harmless until Task 4 |
 | B6 | Approve Python dev tools: `pytest`, `ruff`, `mypy` | You | **Resolved 2026-11-13** |
 | B7 | Land the approved `'jupyterlab'` value in log-core's `HostInfo.editor` | Monorepo owner | `session.start` uses the older `vscode` block; the analyzer cannot tell a JupyterLab session from a VS Code one |

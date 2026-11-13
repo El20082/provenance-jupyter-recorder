@@ -123,7 +123,7 @@ UTF-16 offsets. That is checked when the wiring connects to real JupyterLab sign
 
 ### Step 3: The real build (Task 3)
 
-**Dependencies added (blocker B4):**
+**Dependencies added (blocker B4; all confirmed by the project owner on 2026-11-13):**
 
 | Package | Range | Kind | Why |
 | --- | --- | --- | --- |

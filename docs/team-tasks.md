@@ -372,7 +372,6 @@ These are for the project owner, but anyone can help draft them.
 | B1 | Approve the notebook `view` field and format | Monorepo owner |
 | B2 | Text-view edge cases: notebooks before format 4.5, `\r\n` | Monorepo owner, then project owner |
 | B3 / Decision 7 | Copy VS Code helpers or share them | Project owner |
-| B4 | Confirm the build dependencies already added | Project owner |
 | B5 | Wire up `style/` or delete it | Project owner |
 | B7 | Land `'jupyterlab'` in `HostInfo.editor` | Monorepo owner |
 | Decision 6 | Real-time collaboration: require it off for v1? | Project owner |
