@@ -109,3 +109,57 @@ Typecheck, ESLint and Prettier are clean.
 write keeps its lines and writes them later in order; a lost reply does not duplicate lines; a
 foreign write to the log is reported; `session.start` is written at once and passes log-core's
 parser and validator; `session.end` is chained last; ending twice is harmless.
+
+### Step 4: Activation in the plugin, and the real-JupyterLab gate
+
+| File | What it does |
+| --- | --- |
+| `src/recorder/activation/activation.ts` | Discovers manifests, then starts one session per verified root, each in isolation as in VS Code, so one folder that cannot start never stops the others. If the server cannot report host facts, recording still starts |
+| `src/index.ts` | Runs activation when JupyterLab starts, reports skipped and failed folders in the console, and ends every session on `pagehide` |
+| `THIRD-PARTY-NOTICES.txt` | Licenses for the libraries now bundled through log-core: `@noble/ed25519`, `@noble/hashes`, `@noble/ciphers` (MIT) and `canonicalize` (Apache-2.0) |
+
+**The gate.** In JupyterLab 4.5.0 with headless Chrome, using a server root holding three
+folders:
+
+| Folder | Manifest | Result |
+| --- | --- | --- |
+| `data100/hw1` | Valid, signed under a test root key | Recorded: `.provenance/session-<id>.slog` created |
+| `data100/hw2` | Same manifest with its assignment id changed | Refused as `manifest_chain_invalid`; nothing written |
+| `data100/hw3` | None | Ignored; nothing written |
+
+The log on disk was then checked with log-core: it parses, `validateChain` returns ok, the file
+name matches `session.start.session_id`, and it holds `session.start` then `session.end`,
+written when the browser closed.
+
+The test root key was swapped in only for that build and restored at once. The final build
+contains the real dev root key and not the test key, both checked.
+
+**Found during the gate:** an editable `pip install` copies the frontend once, so rebuilding
+changed nothing JupyterLab served. `jupyter labextension develop . --overwrite` links it
+instead; the README now says so.
+
+**Verified overall:**
+
+| Check | Result |
+| --- | --- |
+| `npm test` | 84 passed, 77 todo |
+| `npm run typecheck`, `npm run lint` | Clean |
+| `pytest`, `ruff check`, `ruff format --check`, `mypy` | 32 passed; clean |
+
+**Not done in Task 4,** by design: the notebook and editor signals are not connected, so no
+edits are recorded yet (Tasks 5 and 6). There is no status item, no `.slog.meta`, no chain
+recovery after a reload, and no rolling seal (Task 7). The analyzer gate script cannot run yet,
+because a bundle needs `.slog.meta` and a seal.
+
+**Not verified:**
+- JupyterLab 4.4.5, which Data 101 and 102 run.
+- More than one browser tab open on the same notebook. Each tab would start its own session
+  today; `tab-ownership.ts` is still a stub (Task 7).
+- Whether the log routes keep a DataHub server from shutting down when idle (Task 6).
+
+## Summary for the project owner
+
+Task 4 is complete. The recorder now starts, verifies assignments and writes valid, chained
+logs in real JupyterLab. The only new blocker is B7 (monorepo owner). The new runtime
+dependencies, `@jupyterlab/services` and `@jupyterlab/coreutils`, are supplied by JupyterLab
+itself and fall under B4.

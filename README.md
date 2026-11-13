@@ -13,10 +13,10 @@ and Neovim (`provenance-neovim-recorder`).
 Its bundles are designed to be format-compatible with the other recorders, so the same
 analyzer, validation checks and heuristics can read them.
 
-> **Status: early development. Nothing records yet.** The extension builds, installs and
-> loads in JupyterLab 4.5. `log-core` is wired in through the `vendor/provenance` submodule,
-> and the session host and notebook-to-`doc.*` conversion are implemented and tested. Most
-> other source and test files are still stubs. See [Open decisions](#open-decisions) and
+> **Status: early development.** In JupyterLab 4.5 the extension finds verified assignment
+> folders, starts a session for each, and writes a hash-chained log with `session.start` and
+> `session.end`. Edits are not recorded yet: the notebook signals are wired in later tasks.
+> Many source and test files are still stubs. See [Open decisions](#open-decisions) and
 > `docs/plans/2026-11-13-log-core-fix-and-build.md`.
 
 ---
@@ -299,8 +299,14 @@ npm test                 # Vitest: unit, conformance and gate tests
 npm run typecheck
 npm run lint             # ESLint and Prettier
 pip install -e .         # builds the labextension and installs both extensions
-jupyter lab              # the browser console shows "provjup:plugin: loaded"
+pip install --group dev  # pytest, ruff, mypy
+jupyter labextension develop . --overwrite   # serve rebuilt frontends without reinstalling
+jupyter lab
 ```
+
+In JupyterLab, the browser console reports which assignment folders are being recorded.
+After changing the frontend, run `npm run build` and reload the page. Python checks:
+`pytest`, `ruff check provjup tests/server` and `mypy`.
 
 Each npm command also has a `make` target (`make test`, `make lint` and so on).
 `make vectors` regenerates the conformance fixtures from a monorepo checkout set in
