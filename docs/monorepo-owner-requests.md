@@ -14,6 +14,7 @@ students use the recorder.
 | 3 | `extension_hash` vectors | Test vectors | Task 7 |
 | 4 | Secret rule wording | Security policy | Before student use |
 | 5 | Analyzer notebook viewer built from JupyterLab | New analyzer dependencies | Before students' notebooks are reviewed |
+| 6 | `cell.execute` event for cell runs, with an output digest | Format change | Task 10 |
 
 `HostInfo.editor` gaining `'jupyterlab'` is already approved and is not repeated here.
 
@@ -124,15 +125,48 @@ its own chunk). Notebooks then look in the analyzer as they did to the student.
 - **The replay overlays** (gutter decorations, line hover, cursor marker, contributor ribbons)
   ported from Monaco onto each cell's CodeMirror editor.
 
-No format change is needed beyond request 1. Outputs are not recorded, so the viewer shows code
-and Markdown only, and defaults to Python highlighting because the view records no kernel
-language.
+No format change is needed beyond request 1. Output content is not recorded, so the viewer shows
+code and Markdown, plus run markers from `cell.execute` (request 6). It defaults to Python
+highlighting because the view records no kernel language.
 
 **Approval needed:** the new analyzer dependencies and their bundle size.
 
-## Related, not requested yet
+## 6. A `cell.execute` event for cell runs
 
-`cell.execute`, a proposed event for cell runs, would also be a format change. It waits on
-this project's own decisions 1 and 10 and is not part of this request.
+**Decided by the project owner and project lead (2026-11-13):** record each cell run, with a
+**digest** of its outputs, so the analyzer can show when a student ran code and whether the
+results changed. Output content is never recorded: it can be large and can contain personal
+data, and stored bundles keep no source files anyway.
+
+**Why a new event.** `terminal.command` has a similar shape, but the `no_intermediate_errors`
+heuristic reads it as shell commands; mixing cell runs in would change that flag's meaning.
+
+**Draft payload** (names and shapes for the owner to finalize):
+
+| Field | Meaning |
+| --- | --- |
+| `path` | The notebook, relative to the assignment root |
+| `cell_id` | The cell that ran; matches its header in the `ipynb-source-v1` view |
+| `source_sha256` | Hash of the cell's source when it ran, tying the run to the replayed view |
+| `execution_count` | The kernel's run counter, or `null` |
+| `started_t` | Monotonic ms when the run was scheduled; the envelope's `t` is when it ended |
+| `status` | `ok`, `error`, or `aborted` (interrupted, kernel restarted, or never finished) |
+| `error_name` | The exception name, such as `ZeroDivisionError`, on error only. Not the message, which can contain data |
+| `outputs` | One digest per output: `output_type`, MIME types, byte size, and `sha256` of the output as nbformat JSON. Capped at a fixed number of entries, with a flag when capped |
+
+One event per cell, so "run all" produces one per cell. Outputs are hashed when the run ends,
+never on the keystroke path.
+
+**Also possible later:** when a submission includes the `.ipynb`, ingest could compare its
+outputs with each cell's last recorded digest, before the source files are stripped. A
+mismatch would show outputs that no recorded run produced.
+
+**Needs:** the event type and payload in log-core with vectors, analyzer support (run markers
+in the notebook viewer, request 5), and an `/architecture` update.
+
+**Open questions for the owner:** whether clearing outputs should be its own event, and the
+cap on output entries per run.
+
+## Related, not requested yet
 
 The other required monorepo changes are listed in `README.md` under "Required monorepo changes".

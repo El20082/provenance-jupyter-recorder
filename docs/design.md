@@ -16,7 +16,10 @@ a new product. Unlike them, it does not port the format: it imports `log-core`.
 In: notebooks and text files in JupyterLab and Notebook 7, activated by a verified
 manifest.
 
-Out: cell outputs, execution history, VS Code notebooks, Colab.
+Also in, once log-core adds it: cell runs, as `cell.execute` events carrying a digest of each
+run's outputs (decided 2026-11-13).
+
+Out: output content, kernel activity, VS Code notebooks, Colab.
 
 **Deployment:** Berkeley DataHub first, piloted on Data 100, then Data 101 and Data 102, with `provjup` in the
 course image. Local Jupyter is a v1 demo, not full support.
@@ -88,7 +91,8 @@ Notebooks then look in the analyzer as they did to the student. Consequences for
   containing a line like `# %% [code] id=…` is never split in two.
 - Cell ids must stay unique and stable for the life of a notebook; the recorder already refuses
   notebooks without them.
-- Outputs are not recorded, so the viewer shows code and Markdown only.
+- Output content is not recorded, so the viewer shows code and Markdown. Cell runs appear as
+  markers from `cell.execute`, showing success or failure and whether the outputs changed.
 - The view records no kernel language. The target courses use Python, so the viewer defaults to
   Python highlighting; recording the language would be a format change.
 

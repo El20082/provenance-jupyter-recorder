@@ -76,7 +76,7 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 | 9.4 | Data 100 image, then 101 and 102 | M | 9.1 | DataHub support answers | #43 |
 | 9.5 | Local Jupyter demo | S | 7.4 | — | #44 |
 | 9.6 | Guides: student, staff, hub, releasing | M | 9.3 | — | #45 |
-| 10 | Cell runs (`cell.execute`) | L | 5.2, 2.7 | Decisions 1 and 10, monorepo approval | #46 |
+| 10 | Cell runs (`cell.execute`) with an output digest (decided) | L | 5.2, 2.7 | Monorepo approval (request 6) | #46 |
 
 Outreach that is not code is at the end.
 
@@ -333,11 +333,18 @@ assignment end to end. Waits on DataHub support's answers.
 built. The staff guide must cover: provisional seals, staff access to the identity file, the
 `.provenance` placeholder and `files:` entries for Otter Assign.
 
-### Task 10: Cell runs (on hold)
+### Task 10: Cell runs
 
-A `cell.execute` event, and run markers in the analyzer's replay. Waits on decisions 1 and 10
-and on monorepo approval, because it changes the log format. Do not start. The analyzer's cell
-view is not part of this: it is task 2.7.
+**Decided 2026-11-13** with the project lead: record each cell run as a new `cell.execute` event, with a **digest** of its outputs (hashes, sizes and output types), never the output content. The analyzer shows runs and whether their results changed.
+
+- **Recorder:** one `cell.execute` per cell run, from `NotebookActions.executionScheduled` and
+  `executed`, emitted through `session-host.ts`. Hash the outputs when the run ends, never on
+  the keystroke path. Files: `src/recorder/wiring/notebook-wiring.ts`, `src/recorder/events/`.
+- **Analyzer:** run markers in the JupyterLab notebook viewer (2.7): when each cell ran, whether
+  it failed, and whether its outputs changed since the last run.
+- **Blocked by** the monorepo owner: `cell.execute` is a format change. The draft payload is
+  request 6 in [`monorepo-owner-requests.md`](monorepo-owner-requests.md). Do not merge
+  recorder code that emits it before log-core has it.
 
 ## Not code: outreach
 
@@ -362,5 +369,4 @@ These are for the project owner, but anyone can help draft them.
 | B5 | Wire up `style/` or delete it | Project owner |
 | B7 | Land `'jupyterlab'` in `HostInfo.editor` | Monorepo owner |
 | Decision 6 | Real-time collaboration: require it off for v1? | Project owner |
-| Decisions 1, 10 | Record cell runs and output details? | Project owner, then monorepo owner |
 | — | `NOTICE` copyright holder | Project owner |
