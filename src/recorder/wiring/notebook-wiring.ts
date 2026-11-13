@@ -1,360 +1,118 @@
 /**
- * ISharedNotebook and ISharedCell signals to doc.* events.
+ * Notebook changes to doc.* events, recorded as the `ipynb-source-v1` text view.
  *
- * TODO: not implemented. See docs/design.md.
+ * Mirrors the VS Code recorder's doc-wiring: doc.open seeds reconstruction, each edit is a
+ * doc.change of view deltas, doc.save carries the hash of the saved view, and doc.close
+ * ends the document. Every event goes through the SessionHost, so it is chained.
+ *
+ * The JupyterLab side (ISharedNotebook / ISharedCell signals) calls these methods; it is
+ * wired in a later task. Everything here is synchronous and does no I/O.
+ *
+ * Not here, by design:
+ * - paste, selection, focus and heartbeat events: their own modules, in Task 6;
+ * - session.start / session.end: the session lifecycle, in Task 4;
+ * - cell execution and kernel events: not part of the format (decisions 1 and 10).
  */
 
-import { sha256Hex } from '../../core/index.ts';
-import { textView, type CellSource } from '../../notebook/text-view.ts';
-import { SessionHost } from '../session/session-host.ts';
+import { sha256Hex } from '../../core/index';
+import type { DocChangeDelta, DocOpenPayload } from '../../core/index';
+import {
+  cellListDeltas,
+  applySourceOps,
+  sourceEditDeltas,
+  type SourceOp,
+} from '../../notebook/cell-delta';
+import { OffsetMap } from '../../notebook/offset-map';
+import { checkCells, textView, type CellSource, type ViewProblem } from '../../notebook/text-view';
+import { viewOfSavedNotebook } from '../../notebook/view-save';
+import type { SessionHost } from '../session/session-host';
 
-export interface Scheduler {
-  every(fn: () => void, milliseconds: number): () => void;
+/**
+ * doc.open inlines content up to this many UTF-8 bytes, as the VS Code recorder does
+ * (`inline-content-limits.ts`). Copied, not imported: whether shared recorder helpers move
+ * into a package is open decision 7.
+ */
+export const MAX_INLINE_BYTES = 64 * 1024;
+
+export type OpenResult = { ok: true } | { ok: false; reason: ViewProblem | 'already_open' };
+
+interface OpenNotebook {
+  cells: CellSource[];
+  map: OffsetMap;
 }
 
-export class ActivityRecorder {
-  private notebooks = new Map<string, CellSource[]>();
+export class NotebookWiring {
+  private readonly open = new Map<string, OpenNotebook>();
 
-  private executions = new Map<
-    string,
-    {
-      path: string;
-      cell_id: string;
-      source: string;
-    }
-  >();
+  constructor(private readonly host: Pick<SessionHost, 'emit'>) {}
 
-  private stopped = false;
-  private cancel: () => void;
-
-  constructor(
-    private host: SessionHost,
-    scheduler: Scheduler,
-    heartbeatMs = 30000,
-  ) {
-    if (!Number.isFinite(heartbeatMs) || heartbeatMs <= 0) {
-      throw new Error('Invalid heartbeat interval');
-    }
-
-    host.emit('session.start', {
-      host: { editor: 'jupyterlab' },
-    });
-
-    this.cancel = scheduler.every(() => {
-      this.emit('session.heartbeat', {});
-    }, heartbeatMs);
+  isOpen(path: string): boolean {
+    return this.open.has(path);
   }
 
-  private emit(
-    type: string,
-    payload: Record<string, unknown>,
-  ): void {
-    if (!this.stopped) {
-      this.host.emit(type, payload);
-    }
-  }
+  /** A notebook was opened. Notebooks whose cells lack unique ids are not recorded. */
+  opened(path: string, cells: readonly CellSource[]): OpenResult {
+    if (this.open.has(path)) return { ok: false, reason: 'already_open' };
+    const problem = checkCells(cells);
+    if (problem !== null) return { ok: false, reason: problem };
 
-  private validate(cells: CellSource[]): void {
-    const missingId = cells.some(cell => !cell.id);
-    const duplicateId =
-      new Set(cells.map(cell => cell.id)).size !== cells.length;
+    const copy = cells.map((cell) => ({ ...cell }));
+    this.open.set(path, { cells: copy, map: new OffsetMap(copy) });
 
-    if (missingId || duplicateId) {
-      throw new Error('Cell IDs must be present and unique');
-    }
-  }
-
-  open(path: string, cells: CellSource[]): void {
-    if (this.stopped || this.notebooks.has(path)) {
-      return;
-    }
-
-    this.validate(cells);
-    this.notebooks.set(path, structuredClone(cells));
-
-    const content = textView(cells);
-
-    this.emit('doc.open', {
+    const view = textView(copy);
+    const payload: DocOpenPayload = {
       path,
-      view: 'ipynb-source-v1',
-      content,
-      sha256: sha256Hex(content),
-      line_count: content.split('\n').length,
-    });
-  }
-
-  /**
-   * Reconcile source edits, cell additions/deletions,
-   * moves, and cell type changes.
-   */
-  update(path: string, cells: CellSource[]): void {
-    const previous = this.notebooks.get(path);
-
-    if (this.stopped || !previous) {
-      return;
-    }
-
-    this.validate(cells);
-
-    const before = textView(previous);
-    const after = textView(cells);
-
-    if (before === after) {
-      return;
-    }
-
-    this.notebooks.set(path, structuredClone(cells));
-
-    // Find the shared prefix.
-    let start = 0;
-
-    while (
-      start < before.length &&
-      start < after.length &&
-      before[start] === after[start]
-    ) {
-      start++;
-    }
-
-    // Find the shared suffix.
-    let endBefore = before.length;
-    let endAfter = after.length;
-
-    while (
-      endBefore > start &&
-      endAfter > start &&
-      before[endBefore - 1] === after[endAfter - 1]
-    ) {
-      endBefore--;
-      endAfter--;
-    }
-
-    const oldCells = new Map(
-      previous.map(cell => [cell.id, cell]),
-    );
-
-    const newCells = new Map(
-      cells.map(cell => [cell.id, cell]),
-    );
-
-    const changedIds = cells
-      .filter(cell => oldCells.get(cell.id)?.source !== cell.source)
-      .map(cell => cell.id);
-
-    // Internal UTF-16 offset delta.
-    // Conversion to upstream line/character ranges is still needed.
-    this.emit('doc.change', {
-      path,
-      offset: start,
-      delete_count: endBefore - start,
-      text: after.slice(start, endAfter),
-      cell_ids: changedIds,
-    });
-
-    const added = cells
-      .filter(cell => !oldCells.has(cell.id))
-      .map(cell => cell.id);
-
-    const removed = previous
-      .filter(cell => !newCells.has(cell.id))
-      .map(cell => cell.id);
-
-    const typeChanges = cells
-      .filter(cell => {
-        const oldCell = oldCells.get(cell.id);
-
-        return oldCell && oldCell.cell_type !== cell.cell_type;
-      })
-      .map(cell => ({
-        cell_id: cell.id,
-        before: oldCells.get(cell.id)!.cell_type,
-        after: cell.cell_type,
-      }));
-
-    const commonBefore = previous
-      .filter(cell => newCells.has(cell.id))
-      .map(cell => cell.id);
-
-    const commonAfter = cells
-      .filter(cell => oldCells.has(cell.id))
-      .map(cell => cell.id);
-
-    const reordered = commonBefore.some(
-      (id, index) => id !== commonAfter[index],
-    );
-
-    if (
-      added.length > 0 ||
-      removed.length > 0 ||
-      typeChanges.length > 0 ||
-      reordered
-    ) {
-      this.emit('notebook.cells.change', {
-        path,
-        added,
-        removed,
-        type_changes: typeChanges,
-        order: cells.map(cell => cell.id),
-      });
-    }
-  }
-
-  paste(
-    path: string,
-    cellId: string,
-    text: string,
-    selection: unknown,
-  ): void {
-    const exists = this.notebooks
-      .get(path)
-      ?.some(cell => cell.id === cellId);
-
-    if (!exists) {
-      return;
-    }
-
-    this.emit('paste', {
-      path,
-      cell_id: cellId,
-      text,
-      size_utf16: text.length,
-      selection,
-    });
-  }
-
-  selection(
-    path: string,
-    cellId: string,
-    selections: unknown,
-  ): void {
-    const exists = this.notebooks
-      .get(path)
-      ?.some(cell => cell.id === cellId);
-
-    if (!exists) {
-      return;
-    }
-
-    this.emit('selection.change', {
-      path,
-      cell_id: cellId,
-      selections,
-    });
-  }
-
-  save(path: string, savedCells: CellSource[]): void {
-    if (this.stopped || !this.notebooks.has(path)) {
-      return;
-    }
-
-    this.validate(savedCells);
-
-    const content = textView(savedCells);
-
-    this.emit('doc.save', {
-      path,
-      content,
-      view: 'ipynb-source-v1',
-      sha256: sha256Hex(content),
-    });
-  }
-
-  execute(
-    path: string,
-    cellId: string,
-    executionId: string,
-  ): void {
-    const cell = this.notebooks
-      .get(path)
-      ?.find(cell => cell.id === cellId);
-
-    if (this.stopped || !cell || cell.cell_type !== 'code') {
-      return;
-    }
-
-    if (this.executions.has(executionId)) {
-      throw new Error('Duplicate execution ID');
-    }
-
-    const execution = {
-      path,
-      cell_id: cellId,
-      source: cell.source,
+      sha256: sha256Hex(view),
+      line_count: view.split('\n').length,
     };
-
-    this.executions.set(executionId, execution);
-
-    this.emit('cell.execution.start', {
-      ...execution,
-      execution_id: executionId,
-    });
+    if (new TextEncoder().encode(view).length <= MAX_INLINE_BYTES) payload.content = view;
+    else payload.truncated = true;
+    this.host.emit('doc.open', payload);
+    return { ok: true };
   }
 
-  executed(executionId: string, success: boolean): void {
-    const execution = this.executions.get(executionId);
+  /** A cell's source changed. `ops` is the Yjs-format delta of that change. */
+  sourceChanged(path: string, cellId: string, ops: readonly SourceOp[]): void {
+    const notebook = this.open.get(path);
+    if (notebook === undefined) return;
+    const index = notebook.cells.findIndex((cell) => cell.id === cellId);
+    const cell = notebook.cells[index];
+    if (cell === undefined) return;
 
-    if (!execution) {
-      return;
-    }
-
-    this.executions.delete(executionId);
-
-    this.emit('cell.execution.end', {
-      ...execution,
-      execution_id: executionId,
-      success,
-    });
+    const deltas = sourceEditDeltas(notebook.map, index, cell.source, ops);
+    cell.source = applySourceOps(cell.source, ops);
+    notebook.map.updateCell(index, cell.source);
+    this.emitChange(path, deltas);
   }
 
-  focus(active: boolean, path?: string): void {
-    this.emit('focus.change', {
-      active,
-      path: path ?? null,
-    });
+  /** Cells were added, deleted, moved or changed type. `cells` is the new full list. */
+  cellsChanged(path: string, cells: readonly CellSource[]): void {
+    const notebook = this.open.get(path);
+    if (notebook === undefined || checkCells(cells) !== null) return;
+
+    const next = cells.map((cell) => ({ ...cell }));
+    const deltas = cellListDeltas(notebook.map, notebook.cells, next);
+    notebook.cells = next;
+    notebook.map.reset(next);
+    this.emitChange(path, deltas);
   }
 
-  kernel(
-    path: string,
-    action: string,
-    kernelId: string | null,
-  ): void {
-    if (!this.notebooks.has(path)) {
-      return;
-    }
-
-    this.emit('kernel.lifecycle', {
-      path,
-      action,
-      kernel_id: kernelId,
-    });
+  /** The notebook was saved. `savedText` is the file as written to disk. */
+  saved(path: string, savedText: string): void {
+    if (!this.open.has(path)) return;
+    const saved = viewOfSavedNotebook(savedText);
+    if (!saved.ok) return;
+    this.host.emit('doc.save', { path, sha256: saved.sha256 });
   }
 
-  close(path: string): void {
-    if (!this.notebooks.delete(path)) {
-      return;
-    }
-
-    this.emit('doc.close', { path });
-
-    for (const [id, execution] of this.executions) {
-      if (execution.path === path) {
-        this.executions.delete(id);
-      }
-    }
+  closed(path: string): void {
+    if (!this.open.delete(path)) return;
+    this.host.emit('doc.close', { path });
   }
 
-  async dispose(): Promise<void> {
-    if (!this.stopped) {
-      this.cancel();
-
-      for (const path of [...this.notebooks.keys()]) {
-        this.close(path);
-      }
-
-      this.emit('session.end', {});
-      this.stopped = true;
-    }
-
-    await this.host.flush();
+  private emitChange(path: string, deltas: DocChangeDelta[]): void {
+    if (deltas.length === 0) return;
+    // `source` is always 'typed' until paste reconciliation lands (Task 6), as in VS Code.
+    this.host.emit('doc.change', { path, deltas, source: 'typed' });
   }
 }
