@@ -17,7 +17,7 @@ classifiers = [
     "Framework :: Jupyter :: JupyterLab :: Extensions",
     "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
 ]
-dependencies = ["jupyter_server>=2.16.0,<3"]
+dependencies = ["jupyter_server>=2.16.0,<3", "watchdog>=4,<8"]
 
 [dependency-groups]
 # Development only; never installed for students.
