@@ -6,3 +6,16 @@ __pycache__/
 *.egg-info/
 .ipynb_checkpoints/
 provjup/labextension/
+
+# NOTE: tests/conformance/fixtures/ is intentionally committed (golden vectors
+# are the checked-in parity gate; CI must run without the monorepo present).
+
+# OS
+.DS_Store
+
+# Secrets: never commit a real signing key
+*.key
+.env
+
+# Superpowers session state
+.superpowers/
