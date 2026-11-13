@@ -2,7 +2,7 @@
 
 `_jupyter_labextension_paths` tells JupyterLab where the prebuilt frontend lives, and
 `_jupyter_server_extension_points` registers the server extension. The server extension
-moves bytes only; its routes land in Task 4.
+moves bytes only; see `provjup/api/routes.py` for its routes.
 """
 
 from __future__ import annotations
@@ -23,4 +23,7 @@ def _jupyter_server_extension_points() -> list[dict[str, str]]:
 
 
 def _load_jupyter_server_extension(server_app: Any) -> None:
-    server_app.log.info("provjup: server extension loaded (no routes yet)")
+    from .api.routes import setup_handlers
+
+    setup_handlers(server_app.web_app, server_app.root_dir)
+    server_app.log.info("provjup: server extension loaded")

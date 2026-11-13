@@ -19,6 +19,10 @@ classifiers = [
 ]
 dependencies = ["jupyter_server>=2.16.0,<3"]
 
+[dependency-groups]
+# Development only; never installed for students.
+dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11"]
+
 [tool.hatch.build.targets.sdist]
 artifacts = ["provjup/labextension"]
 exclude = [".github", "node_modules", "lib", "vendor/provenance/packages/*/node_modules"]
