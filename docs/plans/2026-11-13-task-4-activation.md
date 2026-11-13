@@ -57,3 +57,25 @@ end of this task.
 **Choice made:** the offset check is an addition to VS Code's writer, which drops lines on a
 failed write. Going through HTTP adds the risk of a retried request appending twice, which a
 local file handle does not have.
+
+### Step 2: Server client and manifest verification
+
+| File | What it does |
+| --- | --- |
+| `src/recorder/io/server-client.ts` | Calls the three server routes through JupyterLab's `ServerConnection`. Every method returns a value; none throws |
+| `src/recorder/activation/root-public-key.ts` | The embedded root key: the VS Code recorder's DEV root key, so the monorepo's dev manifests work here too. A release swaps in the production key (Task 9) |
+| `src/recorder/activation/manifest-loader.ts` | Parses and verifies manifest text through log-core's `verifyManifestChain` |
+| `src/recorder/activation/manifest-discovery.ts` | Verifies every manifest the server lists; failures are reported as skipped and never recorded |
+| `tests/support/manifests.ts` | Builds real signed 2.0 manifests with fresh test keys, like VS Code's tests |
+
+**Difference from VS Code:** only Manifest 2.0 is accepted. provjup has no 1.x history, so it
+has no grandfathered legacy course key, and a 1.x manifest is refused with
+`legacy_manifest_unsupported` (design §6).
+
+**Dependencies added,** both supplied by JupyterLab at runtime, like `@jupyterlab/application`
+(B4): `@jupyterlab/services` `^7.4.0` and `@jupyterlab/coreutils` `^6.4.0`. Both ranges match
+what JupyterLab 4.4.0 itself requires.
+
+**Verified:** 9 tests. A valid manifest is accepted; a changed payload, a changed course cert,
+a different root key, a 1.x manifest and non-JSON text are all refused without throwing.
+Typecheck, ESLint and Prettier are clean.

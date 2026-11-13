@@ -18,6 +18,18 @@ export {
   DEFAULT_CAPTURE_POLICY,
   FLOOR_EVENT_KINDS,
   isEventKindCaptured,
+  parseManifest,
+  verifyManifestChain,
+  manifestFormatVersion,
+  MANIFEST_FORMAT_VERSION_2,
+  resolveCapturePolicy,
+  generateSessionKeypair,
+  buildFileScope,
+  isExactEntry,
+  shouldFlush,
+  DEFAULT_BUFFER_POLICY,
+  signManifest,
+  signCourseCert,
 } from '@provenance/log-core';
 
 export type {
@@ -34,4 +46,11 @@ export type {
   DocClosePayload,
   Position,
   Range,
+  Manifest,
+  ManifestChainError,
+  Result,
+  SessionKeypair,
+  SessionStartPayload,
+  SessionFileScope,
+  BufferPolicyConfig,
 } from '@provenance/log-core';
