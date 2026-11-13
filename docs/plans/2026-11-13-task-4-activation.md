@@ -79,3 +79,33 @@ what JupyterLab 4.4.0 itself requires.
 **Verified:** 9 tests. A valid manifest is accepted; a changed payload, a changed course cert,
 a different root key, a 1.x manifest and non-JSON text are all refused without throwing.
 Typecheck, ESLint and Prettier are clean.
+
+### Step 3: Session writer and session start
+
+| File | What it does |
+| --- | --- |
+| `src/recorder/io/session-writer.ts` | Port of VS Code's writer: synchronous `append`, log-core's buffer policy (1 s or 256 KB), one flush at a time so writes stay ordered |
+| `src/recorder/session/recorder-context.ts` | Builds `session.start`: assignment, full manifest, `manifest_sig`, `machine_id`, `file_scope`, recorder id `provjup`, session public key |
+| `src/recorder/session/recording-session.ts` | VS Code's `startSession` steps 3a to 6: capture policy, keypair, context, writer, host, `session.start` written immediately; `end()` emits `session.end` |
+| `src/recorder/session/session-registry.ts` | One session per assignment root; ends them in order |
+| `tests/support/fake-server.ts` | In-memory server with the same offset rule as the Python one; can fail or lose replies on demand |
+
+**Choices made:**
+
+- **Failed writes are retried, not dropped.** VS Code drops buffered lines when a write
+  fails, because retrying could duplicate them. The server's offset check removes that risk,
+  so failed lines stay buffered and go out on the next flush. If a retry finds the bytes
+  already written, because only the reply was lost, it counts them as written. This follows
+  the granularity rule: losing keystrokes silently is worse than writing them late.
+- **`machine_id` hashes the server's hostname and user,** as VS Code does with the local ones,
+  because a browser cannot read them. It changes per session, so sessions are not linkable
+  through it.
+- **`session.start` uses the older `vscode` block** filled with JupyterLab's version and the
+  server's OS, because of blocker B7.
+- **The session private key stays in memory.** Persisting it, encrypted in `.slog.meta`, is
+  Task 7. Until then, a reloaded page cannot sign for an earlier session.
+
+**Verified:** 53 recorder tests. Among them: entries land in order and chain-validate; a failed
+write keeps its lines and writes them later in order; a lost reply does not duplicate lines; a
+foreign write to the log is reported; `session.start` is written at once and passes log-core's
+parser and validator; `session.end` is chained last; ending twice is harmless.
