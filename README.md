@@ -316,7 +316,7 @@ dependencies are approved and the real build exists.
 7. **Shared helpers (decided):** import the VS Code recorder's pure modules from the submodule,
    like log-core. Monorepo request 7 asks for a proper shared package later.
 8. **`log-core` delivery (decided):** a git submodule of the monorepo at `vendor/provenance`.
-9. **Honeypot matching:**
+9. **Honeypot matching (in v1, analyzer side; three questions open):**
    - What counts as "similar": exact, whitespace-normalized, or fuzzy token match,
      and at what threshold?
    - What is a honeypot here: a planted wrong answer, a fake source or a trap

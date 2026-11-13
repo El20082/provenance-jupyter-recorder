@@ -16,6 +16,7 @@ students use the recorder.
 | 5 | Analyzer notebook viewer built from JupyterLab | New analyzer dependencies | Before students' notebooks are reviewed |
 | 6 | `cell.execute` event for cell runs, with an output digest | Format change | Task 10 |
 | 7 | A shared package for the recorders' pure helpers | Refactor | Not urgent; `provjup` works without it |
+| 8 | Honeypot detection in the analyzer | New heuristic and policy question | v1 |
 
 `HostInfo.editor` gaining `'jupyterlab'` is already approved and is not repeated here.
 
@@ -184,6 +185,26 @@ silent, so this is not urgent.
 **Request:** move them into a shared package, for example `packages/recorder-core`, imported by
 the VS Code recorder and by `provjup`. The JetBrains and Neovim recorders could check against it
 too. Until then, please treat these files' paths and exports as used by `provjup`.
+
+## 8. Honeypot detection in the analyzer
+
+**Decided by the project owner (2026-11-13): in v1.** Staff define honeypot answers per
+assignment, and a `honeypot_similarity` heuristic flags cells whose text matches one at any
+recorded point or at submission. Evidence shown: honeypot id, cell id, match score, when the text
+first appeared, how it arrived (typed, pasted, changed on disk) and whether it was still present
+at submission. A hit is a prompt for human review, never a finding on its own.
+
+**What it needs:** the heuristic in `analysis-core`, registered in `known-flag-ids.ts`, with a
+tuning-UI entry and heuristic docs; staff-only storage and editing of honeypot answers in the
+analyzer or server; and an `/architecture` update. No log format change: honeypot answers never
+reach the recorder, the manifest or the bundle.
+
+**Questions for the owner and the project lead:**
+
+1. What counts as a match: exact, whitespace-normalized, or fuzzy, and at what threshold?
+2. What is a honeypot: a planted wrong answer, a fake source, or a trap instruction?
+3. Does comparing student text fit recorder PRD NG5, which rules out judging the code itself?
+   Provenance reasons about how work was produced, not about the code.
 
 ## Related, not requested yet
 

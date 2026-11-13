@@ -64,7 +64,7 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 | 5.2 | Connect notebook edits to the recorder | M | 5.1 | — | — (done in the Task 5 PR) |
 | 5.3 | Record plain text files | M | 5.1 | — | — (done in the Task 5 PR) |
 | 5.4 | Refuse to record while real-time collaboration is on (decision 6) | S | 5.2 | — | #51 |
-| 6.1 | Heartbeats that survive hidden tabs | M | — | — | #22 |
+| 6.1 | Heartbeats that survive hidden tabs | M | — | **Several tabs (project lead)** | #22 |
 | 6.2 | Focus and selection events | S | 5.2, 5.3 | — | #23 |
 | 6.0 | Import VS Code recorder helpers from the submodule (decision 7) | S | — | — | #52 |
 | 6.3 | Paste detection | L | 5.2, 5.3, 6.0 | — | #24 |
@@ -72,10 +72,10 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 | 6.5 | Check DataHub idle shutdown | S | — | — | #26 |
 | 7.1 | `.slog.meta` and atomic writes | M | — | — | #27 |
 | 7.2 | Signed checkpoints | M | 7.1 | — | #28 |
-| 7.3 | Chain recovery after a reload | M | 7.1 | — | #29 |
+| 7.3 | Chain recovery after a reload | M | 7.1 | **Several tabs (project lead)** | #29 |
 | 7.4 | Rolling seal and `extension_hash` | L | 7.2 | Monorepo request 3 | #30 |
-| 7.5 | Save, flush and seal on every cell run | S | 5.2, 7.4 | — | #31 |
-| 7.6 | One session across browser tabs | M | — | **Needs the project lead** (see below) | #32 |
+| 7.5 | Save, flush and seal on every cell run | S | 5.2, 7.4 | **Several tabs (project lead)** | #31 |
+| 7.6 | One session across browser tabs | M | — | **Several tabs (project lead)** | #32 |
 | 7.7 | Degraded mode and status item | M | — | B5 | #33 |
 | 7.8 | Remove the seal-command stubs | S | — | — | #34 |
 | 8.1 | Terminal commands | M | 5.1 | — | #35 |
@@ -117,7 +117,7 @@ Outreach that is not code is at the end.
 | 2.8 | Add each `provjup` release's hash to the allowlist | `packages/analysis-core/src/heuristics/config/known-good-extension-hashes.json` | S | 2.5, a release | — | #18 |
 | 2.9 | `/architecture`: add the JupyterLab recorder to the ecosystem and roadmap diagrams | `tools/architecture/dot/`, `packages/analyzer/src/views/architecture/content/nodes/` | M | — | Owner agreement | #19 |
 | 2.10 | Allow the home-directory secret rule for browser-hosted recorders | `docs/key-management.md` §4.4 and §9 | S | — | Request 4 | #20 |
-| 2.11 | `honeypot_similarity` heuristic and staff-only honeypot storage | `analysis-core`, `analyzer` or `server` | L | — | Decision 9; after v1 | #21 |
+| 2.11 | **`honeypot_similarity` heuristic and staff-only honeypot storage (v1)** | `analysis-core`, `analyzer` or `server` | L | — | Honeypot questions (project lead, monorepo owner; request 8) | #21 |
 
 **Details:**
 
@@ -165,6 +165,15 @@ Outreach that is not code is at the end.
   matter for correctness, not only display: a cell containing a line like `# %% [code] id=…`
   would otherwise be split in two by the viewer.
 - **2.9** is required by the monorepo's `CLAUDE.md` for any new recorder.
+- **2.11, in v1 (decided 2026-11-13):** honeypot detection is analyzer-side work, part of this
+  task. Staff define honeypot answers per assignment; the analyzer flags cells whose text matches
+  one at any recorded point or at submission, with the evidence: honeypot id, cell id, match score,
+  when the text first appeared, how it arrived (typed, pasted, changed on disk) and whether it was
+  still present at submission. A hit is a prompt for human review, never a finding on its own.
+  Honeypot answers never reach the recorder, the manifest or the bundle. **Three questions must be
+  answered first** (request 8): what counts as a match (exact, whitespace-normalized, or fuzzy at
+  what threshold); what a honeypot is (a planted wrong answer, a fake source, or a trap instruction);
+  and whether comparing student text fits recorder PRD NG5, which rules out judging the code itself.
 
 ## Needs the project lead: the same assignment open in several tabs
 
@@ -193,6 +202,17 @@ any edit (the granularity rule).
 
 **Recommendation: A′.** It keeps every edit and one clean session. Two different browsers on one
 assignment are rare; under A′ they fall back to two sessions, which are valid but overlapping.
+
+**Tasks blocked until this is decided:**
+
+| Task | Why |
+| --- | --- |
+| 7.6 (#32) | It is the tab design |
+| 6.1 (#22) | Whether every tab sends heartbeats or only the session owner, and what "focused" means with several tabs |
+| 7.3 (#29) | What happens when the owner tab closes or reloads and another takes over, and how the new session links to the old one |
+| 7.5 (#31) | A cell run in a non-owner tab has to reach the owner tab's log and seal |
+
+9.1 (#40) inherits the block through these. Other tasks work within one session either way.
 
 **Questions for the project lead:**
 
