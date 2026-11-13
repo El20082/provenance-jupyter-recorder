@@ -360,8 +360,8 @@ JupyterLab's installed extensions. `src/recorder/wiring/snapshot-wiring.ts`,
 
 **9.1 End-to-end test in real JupyterLab.** `scripts/e2e/run_e2e.sh`. Choose between Galata
 (JupyterLab's Playwright-based tool; needs dependency approval, and recreates `ui-tests/`, removed in
-#53) and the dependency-free Chrome DevTools Protocol script used in Tasks 4 and 5
-(Playwright with Galata needs dependency approval). Produce a real two-session bundle and pass it
+#53) and the dependency-free Chrome DevTools Protocol script used in Tasks 4 and 5.
+Produce a real two-session bundle and pass it
 through `scripts/verify-bundle-with-analyzer.mjs`. The Task 4 log describes a manual version of
 this check.
 
