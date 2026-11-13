@@ -1,4 +1,7 @@
-# Skeleton only. Dependencies and the labextension build hook are added once approved.
+[build-system]
+requires = ["hatchling>=1.27.0", "jupyterlab>=4.4.0,<5", "hatch-jupyter-builder>=0.9.1"]
+build-backend = "hatchling.build"
+
 [project]
 name = "provjup"
 version = "0.0.0"
@@ -7,14 +10,42 @@ readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.11"
-dependencies = []
+classifiers = [
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
+]
+dependencies = ["jupyter_server>=2.16.0,<3"]
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+[tool.hatch.build.targets.sdist]
+artifacts = ["provjup/labextension"]
+exclude = [".github", "node_modules", "lib", "vendor/provenance/packages/*/node_modules"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["provjup"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"provjup/labextension" = "share/jupyter/labextensions/provjup"
+"install.json" = "share/jupyter/labextensions/provjup/install.json"
+"jupyter-config/server-config" = "etc/jupyter/jupyter_server_config.d"
+
+[tool.hatch.build.hooks.jupyter-builder]
+dependencies = ["hatch-jupyter-builder>=0.9.1"]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = ["provjup/labextension/package.json"]
+skip-if-exists = ["provjup/labextension/package.json"]
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+build_cmd = "build:prod"
+npm = ["npm"]
+
+[tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
+build_cmd = "build"
+npm = ["npm"]
+source_dir = "src"
+build_dir = "provjup/labextension"
 
 [tool.ruff]
 line-length = 100

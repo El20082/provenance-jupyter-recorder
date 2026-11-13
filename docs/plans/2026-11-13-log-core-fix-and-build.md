@@ -21,6 +21,9 @@ Blockers are numbered once and never renumbered. Each says who must act.
 ` in cell sources | Monorepo owner, then you | Notebooks without cell ids are **not recorded at all**, by returning `missing_cell_id`. `
 ` passes through unchanged. |
 | B3 | Decision 7: copy shared VS Code helpers or move them into a package | You | `MAX_INLINE_BYTES` (64 KB) is copied into `notebook-wiring.ts`, and the replay helper in `tests/support/replay.ts` copies analysis-core's. Each copy can drift. |
+| B4 | Confirm the build dependencies added in step 3, which a real build cannot avoid: `@jupyterlab/application` (runtime, supplied by JupyterLab itself), `@jupyterlab/builder` (build only), `jupyter_server` (runtime, already on DataHub), and `hatchling`, `hatch-jupyter-builder` and `jupyterlab` (Python build only) | You | Already added, because you asked for the real build. Remove any you reject. |
+| B5 | Wire `style/index.css` through `"style"` in `package.json`, or delete `style/` | You | `style/` stays unwired, which is harmless. Nothing needs CSS until the status item in Task 4. |
+| B6 | Approve Python dev tools: `pytest`, `ruff`, `mypy` | You | They are configured in `pyproject.toml` but not installed, so the Python side is not linted or tested yet. Needed once `provjup/` gains real code in Task 4. |
 
 ## Steps
 
@@ -117,3 +120,56 @@ signing does not.
 
 **Not verified yet:** that JupyterLab's shared-cell change events use the Yjs delta format with
 UTF-16 offsets. That is checked when the wiring connects to real JupyterLab signals.
+
+### Step 3: The real build (Task 3)
+
+**Dependencies added (blocker B4):**
+
+| Package | Range | Kind | Why |
+| --- | --- | --- | --- |
+| `@jupyterlab/application` | `^4.4.0` | npm runtime | Plugin types; JupyterLab supplies it at runtime |
+| `@jupyterlab/builder` | `^4.4.0` | npm dev | Builds the prebuilt labextension |
+| `jupyter_server` | `>=2.16.0,<3` | Python runtime | Hosts the server extension; DataHub has 2.16 |
+| `hatchling`, `hatch-jupyter-builder`, `jupyterlab` | see `pyproject.toml` | Python build | Builds the frontend during `pip install` |
+
+npm resolved `@jupyterlab/application` to `^4.6.6` by default. The range is widened to
+`^4.4.0`, because JupyterLab checks it when loading the extension, and Data 101 and 102 run
+4.4.5. npm blocked one install script, a font package's attribution message, which is safe to
+skip.
+
+**Files:**
+
+| File | Change |
+| --- | --- |
+| `src/index.ts` | Plugin `provjup:plugin`, so the schema resolves to `schema/plugin.json`. It only logs that it loaded; activation is Task 4 |
+| `provjup/__init__.py` | Labextension path, server extension point, and a load hook that logs |
+| `pyproject.toml` | JupyterLab's extension-template build: `hatch-jupyter-builder`, shared-data for the labextension and server config, PyPI classifiers |
+| `package.json` | `build`, `build:prod`, `build:lib` and `build:labextension` scripts |
+| `Makefile` | `install`, `build`, `test`, `typecheck`, `lint`, `format` and `vectors` targets |
+| `README.md`, `vendor/README.md`, `2026-10-30-plan.md` | Status and Development instructions updated; Task 3 boxes ticked |
+
+**Verified,** in a scratch Python 3.14 environment with JupyterLab 4.5.0, the Data 100 version:
+
+| Check | Result |
+| --- | --- |
+| `jupyter labextension build .` | Compiled successfully |
+| `pip install -e .` | Succeeds; `jupyter labextension list` and `jupyter server extension list` show `provjup` enabled and valid |
+| Real JupyterLab in headless Chrome | The console shows `provjup:plugin: loaded`, with no errors. The server log shows the server extension linked and loaded |
+| `npm test`, `npm run typecheck`, `npm run lint` | 54 passed, 83 todo; clean; clean |
+
+**Not verified:**
+- JupyterLab 4.4.5, the Data 101 and 102 version. Expected to work from the version range, but
+  untested.
+- `make` itself, because it is not installed on this machine; each target only calls an npm
+  script that was run directly.
+- The Python side's lint, type and unit checks (blocker B6).
+
+**Noticed for Task 4:** once `src/index.ts` imports log-core, `@noble/*` and `canonicalize`
+are bundled into the extension, and each needs an entry in `THIRD-PARTY-NOTICES.txt`.
+
+## Where this leaves the plan
+
+- The review's findings are all fixed, and Task 3 is complete apart from blockers B4 to B6.
+- Task 4 (activation, session lifecycle, writer through the server) and the text-file half
+  of Task 5 can start without outside input.
+- The notebook half of Task 5 waits on B1 and B2 before students can use it.
