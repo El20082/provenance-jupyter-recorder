@@ -125,10 +125,17 @@ Outreach that is not code is at the end.
 - **2.7, decided 2026-11-13:** the analyzer shows replayed notebooks with JupyterLab's own open-source notebook components, embedded in its replay view the way Monaco is embedded today
   (`packages/analyzer/src/views/replay/MonacoMount.tsx`, lazy-loaded as its own chunk). Notebooks
   then look in the analyzer as they did to the student. JupyterLab's packages are BSD-3-Clause.
+
+  **Option A is confirmed (2026-11-13): use JupyterLab's published packages as ordinary
+  dependencies, the way the analyzer uses Monaco. No fork, no reimplementation.** If the spike
+  finds option A unworkable, **stop and ask the project owner** before falling back to option B
+  (one Monaco editor per cell plus a Markdown renderer). Do not switch on your own.
+
   Suggested steps:
   1. **Spike first:** mount a read-only JupyterLab notebook (Lumino widgets inside React) behind
      `React.lazy`, measure bundle size and load time, list the exact `@jupyterlab/*` packages,
-     and report back before building further.
+     and report back to the project owner before building further. Try the smallest set first,
+     for example `@jupyterlab/cells` with `rendermime`, before the full notebook package.
   2. **Model from the view:** turn the replayed view into cells with log-core's view parser
      (2.2), and update the notebook model incrementally as `doc.change` events apply.
   3. **Read-only rendering:** highlighted code cells and rendered Markdown. No kernel, no

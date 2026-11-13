@@ -118,8 +118,9 @@ its own chunk). Notebooks then look in the analyzer as they did to the student.
 **What this needs from the monorepo:**
 
 - **New analyzer dependencies:** JupyterLab notebook, CodeMirror and rendermime packages, and
-  Lumino. The exact list comes from a spike; they are lazy-loaded so only notebook replay pays
-  for them. License notices are needed.
+  Lumino, used as published npm packages with no fork. The exact list comes from a spike; they
+  are lazy-loaded so only notebook replay pays for them. License notices are needed. The
+  project owner has confirmed this approach; any fallback to Monaco-per-cell goes back to them.
 - **A view parser in log-core,** the inverse of the `ipynb-source-v1` projection, with vectors, so
   the analyzer and the recorder agree on cell boundaries (request 1).
 - **The replay overlays** (gutter decorations, line hover, cursor marker, contributor ribbons)

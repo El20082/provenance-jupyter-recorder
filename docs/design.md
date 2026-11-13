@@ -84,7 +84,9 @@ recorder needs format additions, which require approval and must ship analyzer-f
 **Analyzer notebook viewer (decided 2026-11-13).** The analyzer shows replayed notebooks with
 JupyterLab's own open-source notebook components (BSD-3-Clause), embedded in its replay view the
 way Monaco is embedded today (`packages/analyzer/src/views/replay/MonacoMount.tsx`, lazy-loaded).
-Notebooks then look in the analyzer as they did to the student. Consequences for the recorder:
+Notebooks then look in the analyzer as they did to the student. The packages are used as
+published npm dependencies, with no fork (option A, confirmed). Falling back to one Monaco
+editor per cell (option B) needs the project owner's approval. Consequences for the recorder:
 
 - The view must be parsable back into cells. log-core gains a parser alongside the projection,
   shared by both sides, and the look-alike header edge case must be settled so that a cell
