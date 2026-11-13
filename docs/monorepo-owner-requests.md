@@ -15,6 +15,7 @@ students use the recorder.
 | 4 | Secret rule wording | Security policy | Before student use |
 | 5 | Analyzer notebook viewer built from JupyterLab | New analyzer dependencies | Before students' notebooks are reviewed |
 | 6 | `cell.execute` event for cell runs, with an output digest | Format change | Task 10 |
+| 7 | A shared package for the recorders' pure helpers | Refactor | Not urgent; `provjup` works without it |
 
 `HostInfo.editor` gaining `'jupyterlab'` is already approved and is not repeated here.
 
@@ -167,6 +168,22 @@ in the notebook viewer, request 5), and an `/architecture` update.
 
 **Open questions for the owner:** whether clearing outputs should be its own event, and the
 cap on output entries per run.
+
+## 7. A shared package for the recorders' pure helpers
+
+**Decided here (2026-11-13, decision 7):** `provjup` imports the VS Code recorder's pure helpers
+directly from the `vendor/provenance` submodule, the same way it imports log-core, instead of
+copying them. These are `events/paste-classifier.ts`, `paste-payload.ts`,
+`inline-content-limits.ts`, `external-change-content.ts`, `external-change-detector.ts`,
+`explanation-tags.ts`, and `state/expected-content.ts` and `expected-content-registry.ts`.
+
+**The risk:** these are internal files of `packages/recorder`, not a published API. Moving or
+renaming them breaks `provjup`'s build on its next submodule update. The failure is loud, not
+silent, so this is not urgent.
+
+**Request:** move them into a shared package, for example `packages/recorder-core`, imported by
+the VS Code recorder and by `provjup`. The JetBrains and Neovim recorders could check against it
+too. Until then, please treat these files' paths and exports as used by `provjup`.
 
 ## Related, not requested yet
 

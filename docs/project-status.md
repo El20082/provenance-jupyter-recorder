@@ -75,7 +75,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | --- | --- | --- | --- |
 | B1 | Approve the `view` field and the `ipynb-source-v1` format | Monorepo owner | The analyzer treats a notebook as a plain file; not usable by students |
 | B2 | Settle text-view edge cases: notebooks before format 4.5, `\r\n` in cells, cell-boundary lookalike lines | Monorepo owner, then you | Notebooks without cell ids are not recorded at all |
-| B3 | Decision 7: copy shared VS Code helpers or share them | You | Two small copies exist and could drift |
+| B3 | Decision 7: shared VS Code helpers | You | **Resolved 2026-11-13 (option D):** imported from the submodule like log-core (#52) |
 | B4 | Confirm the JupyterLab packages added for the build | You | **Resolved 2026-11-13:** all confirmed (`application`, `builder`, `services`, `coreutils`, `notebook`, `fileeditor`, and the Python build tools) |
 | B5 | Wire up `style/` or delete it | You | Unwired, which is harmless until Task 4 |
 | B6 | Approve Python dev tools: `pytest`, `ruff`, `mypy` | You | **Resolved 2026-11-13** |
@@ -95,6 +95,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | 12 | Data 100 is the first pilot |
 | 13 | Vitest, ESLint and Prettier |
 | 14 | `watchdog` for file watching, with a slow polling safety net |
+| 7 | The VS Code recorder's pure helpers are imported from the submodule like log-core, never copied |
 | 6 | Real-time collaboration must be off for v1; the recorder refuses to record while it is on (#51). Group work is a separate future project, highlighted in `docs/team-tasks.md` |
 | 15 | The analyzer shows replayed notebooks with JupyterLab's own notebook components, embedded in its replay view the way Monaco is |
 | 1, 10 | Record each cell run as a new `cell.execute` event, with a digest of its outputs, never their content |
@@ -109,7 +110,6 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 
 | # | Decision | Recommendation |
 | --- | --- | --- |
-| 7 | Shared VS Code helpers | Move them into a shared package if the monorepo owner agrees |
 | 9 | Honeypot matching | After v1 |
 | 5 | Fix VS Code's own notebook gap | Separate work; blocks nothing here |
 | — | `NOTICE` copyright holder | Your call |

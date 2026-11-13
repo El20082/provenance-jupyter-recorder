@@ -30,6 +30,9 @@ merged, branch from `scaffold/initial`.
 - **Copy the VS Code recorder first.** Each task names the matching module in the monorepo's
   `packages/recorder/src/` (also at `vendor/provenance/packages/recorder/src/`). Read it and its
   tests, keep its behavior and names, and write down any difference JupyterLab forces.
+- **Import VS Code's pure helpers, never copy them.** Modules that do not import `vscode`
+  come straight from the submodule through `src/vscode-recorder/`, like log-core through
+  `src/core/` (decision 7). Port only the modules that use `vscode`.
 - **Never change the log format here.** Every event must be one of log-core's types, emitted
   through `session.host.emit`. If you think you need a new field or event, stop and ask.
 - **Record letter by letter.** No avoidable delay, and never merge separate edits into one event.
@@ -59,8 +62,9 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 | 5.4 | Refuse to record while real-time collaboration is on (decision 6) | S | 5.2 | — | #51 |
 | 6.1 | Heartbeats that survive hidden tabs | M | — | — | #22 |
 | 6.2 | Focus and selection events | S | 5.2, 5.3 | — | #23 |
-| 6.3 | Paste detection | L | 5.2, 5.3 | Decision 7 | #24 |
-| 6.4 | External changes on disk | L | 5.2 | Dependency approval (`watchdog`) | #25 |
+| 6.0 | Import VS Code recorder helpers from the submodule (decision 7) | S | — | — | #52 |
+| 6.3 | Paste detection | L | 5.2, 5.3, 6.0 | — | #24 |
+| 6.4 | External changes on disk | L | 5.2, 6.0 | Dependency approval (`watchdog`) | #25 |
 | 6.5 | Check DataHub idle shutdown | S | — | — | #26 |
 | 7.1 | `.slog.meta` and atomic writes | M | — | — | #27 |
 | 7.2 | Signed checkpoints | M | 7.1 | — | #28 |
@@ -247,8 +251,9 @@ signal without discussion.
 - VS Code: `events/paste-classifier.ts`, `paste-reconciler.ts`, `paste-payload.ts`,
   `wiring/paste-command-intercept.ts`.
 - Conformance: `tests/conformance/paste.test.ts` against `fixtures/paste-payload.json`.
-- Blocked by decision 7: copy VS Code's pure helpers or share them through a package. Ask
-  before starting.
+- Import `paste-classifier.ts` and `paste-payload.ts` from the submodule through
+  `src/vscode-recorder/` (6.0, #52); never copy them. Port `paste-reconciler.ts`, which
+  uses `vscode`, as JupyterLab glue.
 
 **6.4 External changes on disk.** Changes made outside the editor (a terminal, `!cmd`, `%load`)
 become `fs.external_change`.
@@ -404,7 +409,6 @@ These are for the project owner, but anyone can help draft them.
 | --- | --- | --- |
 | B1 | Approve the notebook `view` field and format | Monorepo owner |
 | B2 | Text-view edge cases: notebooks before format 4.5, `\r\n` | Monorepo owner, then project owner |
-| B3 / Decision 7 | Copy VS Code helpers or share them | Project owner |
 | B5 | Wire up `style/` or delete it | Project owner |
 | B7 | Land `'jupyterlab'` in `HostInfo.editor` | Monorepo owner |
 | — | `NOTICE` copyright holder | Project owner |

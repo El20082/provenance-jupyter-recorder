@@ -35,6 +35,10 @@ It never blocks recording, and one enrollment serves every course.
 
 - The format is owned by the monorepo's `log-core`. Import it through `src/core/`.
   Never re-implement it here.
+- The VS Code recorder's pure helpers (paste classification, payload builders, content
+  limits, the expected-content model) are imported from the same submodule, through
+  `src/vscode-recorder/`. Never copy them. Only modules that import `vscode` are ported,
+  as JupyterLab glue (decision 7).
 - If the format appears to need a change, stop and ask. Format changes land in the
   monorepo first, with explicit approval.
 - Conformance failures mean the code is wrong. Never edit a vector.
