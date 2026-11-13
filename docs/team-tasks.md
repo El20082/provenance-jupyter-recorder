@@ -16,6 +16,10 @@ things stand see [`project-status.md`](project-status.md).
 > **Group work is a separate future project,** not part of the v1 tasks. See
 > [Group work](#group-work-a-separate-future-project).
 
+> [!WARNING]
+> **Needs the project lead:** the same assignment open in several browser tabs. See
+> [Several tabs](#needs-the-project-lead-the-same-assignment-open-in-several-tabs).
+
 ## Before you start
 
 **Read first:** [`CLAUDE.md`](../CLAUDE.md) (the repo's rules), [`design.md`](design.md), and the
@@ -71,7 +75,7 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 | 7.3 | Chain recovery after a reload | M | 7.1 | — | #29 |
 | 7.4 | Rolling seal and `extension_hash` | L | 7.2 | Monorepo request 3 | #30 |
 | 7.5 | Save, flush and seal on every cell run | S | 5.2, 7.4 | — | #31 |
-| 7.6 | One writer per session across tabs | M | — | Design not decided | #32 |
+| 7.6 | One session across browser tabs | M | — | **Needs the project lead** (see below) | #32 |
 | 7.7 | Degraded mode and status item | M | — | B5 | #33 |
 | 7.8 | Remove the seal-command stubs | S | — | — | #34 |
 | 8.1 | Terminal commands | M | 5.1 | — | #35 |
@@ -161,6 +165,39 @@ Outreach that is not code is at the end.
   matter for correctness, not only display: a cell containing a line like `# %% [code] id=…`
   would otherwise be split in two by the viewer.
 - **2.9** is required by the monorepo's `CLAUDE.md` for any new recorder.
+
+## Needs the project lead: the same assignment open in several tabs
+
+> [!WARNING]
+> **An open question for the project owner to discuss with the project lead.** Task 7.6 (#32) is
+> blocked until it is decided. Do not pick an approach inside the task.
+
+**The situation.** A student can easily have the same JupyterLab open in two browser tabs. Each
+tab runs its own copy of the extension, so today **each tab starts its own session**, with its own
+log in `.provenance/`, and records the edits typed in that tab.
+
+**Why it matters.** The analyzer then sees two sessions running at once on one assignment, which
+can look like two people working at the same time: the "multiple sessions overlap" check may flag
+it, and replaying a file edited in both tabs becomes ambiguous. That looks suspicious although it
+was one student.
+
+**The goal.** One recording session per assignment, however many tabs are open, without losing
+any edit (the granularity rule).
+
+| Option | How it works | Edits in other tabs | Result |
+| --- | --- | --- | --- |
+| A. Lock, other tabs silent | The first tab records; the others do nothing | **Lost** | Breaks the granularity rule; not acceptable |
+| **A′. Lock, other tabs forward** (recommended) | The first tab owns the session and the log. Other tabs send their events to it through the browser's tab-to-tab messaging (`BroadcastChannel`), and it writes them into the one chain. If it closes, another tab takes over with a linked new session | Recorded | One session, one chain. No dependency |
+| B. A session per tab (today) | No change | Recorded | Overlapping sessions; possible misleading flags |
+| C. A server-side lease | The server picks the tab that writes; the others send events through the server | Recorded | Also covers two different browsers, with more moving parts |
+
+**Recommendation: A′.** It keeps every edit and one clean session. Two different browsers on one
+assignment are rare; under A′ they fall back to two sessions, which are valid but overlapping.
+
+**Questions for the project lead:**
+
+1. Is A′ acceptable, or do two different browsers need C?
+2. How should the analyzer treat overlapping sessions from one student in the meantime?
 
 ## Group work: a separate future project
 
@@ -262,8 +299,8 @@ become `fs.external_change`.
 - Frontend: `src/recorder/watch/*`, `src/recorder/state/expected-content*.ts`,
   `src/recorder/events/external-change-*.ts`, `explanation-tags.ts` (stubs).
 - VS Code: `wiring/fs-watcher.ts`, `events/external-change-detector.ts`, `state/`.
-- **Open design question:** how the server tells the browser about a change (polling a route, or
-  JupyterLab's event stream). Propose before building.
+- **Decided 2026-11-13 (6a):** the server reports changes through Jupyter Server's built-in event
+  stream, and the browser listens on its existing connection. No polling, so no added delay.
 - Easy to get wrong: the expected-content model is the source of truth, and the on-disk hash is
   what you compare against. For notebooks, compare views, so output-only changes emit nothing.
 - Conformance: `fixtures/external-change-content.json`. Measure notification speed on a Data 100
@@ -308,9 +345,11 @@ Submission Bundle command.
 the notebook if it has unsaved changes, flush the log and roll the seal, so Otter's export sees
 current files. Test the race with Otter's export cell.
 
-**7.6 One writer per session across tabs.** Two tabs on the same server currently start two
-sessions. `src/recorder/session/tab-ownership.ts` (stub). Design not decided; propose first,
-for example a `BroadcastChannel` lock.
+**7.6 One session across browser tabs.** Two tabs on the same server currently start two
+sessions. `src/recorder/session/tab-ownership.ts` (stub). **Blocked until the project lead
+decides;** see [Several tabs](#needs-the-project-lead-the-same-assignment-open-in-several-tabs)
+for the options. The recommendation is A′: one tab owns the session, the others forward their
+events to it.
 
 **7.7 Degraded mode and status item.** Report a failed disk or write without stopping recording,
 and show a "Provenance: recording" status item.

@@ -95,6 +95,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | 12 | Data 100 is the first pilot |
 | 13 | Vitest, ESLint and Prettier |
 | 14 | `watchdog` for file watching, with a slow polling safety net |
+| 17 | The server reports disk changes through Jupyter Server's event stream, not polling |
 | 16 | Approved dependencies: `watchdog`, `@jupyterlab/statusbar`, `@jupyterlab/apputils` (#54) |
 | 7 | The VS Code recorder's pure helpers are imported from the submodule like log-core, never copied |
 | 6 | Real-time collaboration must be off for v1; the recorder refuses to record while it is on (#51). Group work is a separate future project, highlighted in `docs/team-tasks.md` |
@@ -111,6 +112,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 
 | # | Decision | Recommendation |
 | --- | --- | --- |
+| **18** | **Several browser tabs on one assignment: needs the project lead** | One tab owns the session, the others forward their events to it. See "Several tabs" in `docs/team-tasks.md` (#32) |
 | 9 | Honeypot matching | After v1 |
 | 5 | Fix VS Code's own notebook gap | Separate work; blocks nothing here |
 | — | `NOTICE` copyright holder | Your call |
