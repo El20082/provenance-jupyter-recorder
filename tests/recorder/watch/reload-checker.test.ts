@@ -4,4 +4,6 @@
  * TODO: not implemented. See docs/design.md.
  */
 
-export {};
+import { it } from 'vitest';
+
+it.todo('not implemented');
