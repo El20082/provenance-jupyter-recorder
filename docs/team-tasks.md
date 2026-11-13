@@ -4,6 +4,14 @@ Updated 2026-11-13. This is the list of work anyone on the team can pick up, wit
 to start. For the full plan see [`plans/2026-10-30-plan.md`](plans/2026-10-30-plan.md); for where
 things stand see [`project-status.md`](project-status.md).
 
+> [!IMPORTANT]
+> **Task 2, the analyzer and monorepo changes, is a separate big task and must not be missed.**
+> The analyzer cannot read JupyterLab recordings correctly until it is done. In particular,
+> **check 8 must be deployed before any student uses the recorder**, or the analyzer will
+> report false "edited outside the recording" mismatches against real students. This work
+> happens in the `provenance` monorepo, not here, and most of it needs the monorepo owner's
+> approval first. See [Task 2](#task-2-analyzer-and-monorepo-changes).
+
 ## Before you start
 
 **Read first:** [`CLAUDE.md`](../CLAUDE.md) (the repo's rules), [`design.md`](design.md), and the
@@ -40,6 +48,7 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 
 | ID | Task | Size | Depends on | Blocked by | Owner |
 | --- | --- | --- | --- | --- | --- |
+| **2** | **Analyzer and monorepo changes: a separate big task, see below** | **L** | — | **Monorepo owner** | |
 | 5.1 | Route paths to sessions | S | — | — | |
 | 5.2 | Connect notebook edits to the recorder | M | 5.1 | — | |
 | 5.3 | Record plain text files | M | 5.1 | — | |
@@ -67,9 +76,56 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 | 9.4 | Data 100 image, then 101 and 102 | M | 9.1 | DataHub support answers | |
 | 9.5 | Local Jupyter demo | S | 7.4 | — | |
 | 9.6 | Guides: student, staff, hub, releasing | M | 9.3 | — | |
-| 10 | Cell runs (`cell.execute`) and analyzer cell view | L | 5.2 | Decisions 1 and 10, monorepo approval | |
+| 10 | Cell runs (`cell.execute`) | L | 5.2, 2.7 | Decisions 1 and 10, monorepo approval | |
 
 Outreach that is not code is at the end.
+
+## Task 2: Analyzer and monorepo changes
+
+> [!IMPORTANT]
+> **A separate big task.** Everything here changes the `provenance` monorepo
+> (`ProvenanceTools/provenance`): `log-core`, `analysis-core`, the analyzer UI or monorepo docs.
+> Follow the **monorepo's** `CLAUDE.md`, not this repo's, and open the pull requests there.
+> Format changes need the monorepo owner's explicit approval and a version bump. The monorepo
+> also requires the `/architecture` page to be updated in the same pull request as any change
+> to the format, a validation check, or a recorder.
+>
+> The requests waiting on the owner are in [`monorepo-owner-requests.md`](monorepo-owner-requests.md).
+
+| ID | Change | Where in the monorepo | Size | Depends on | Blocked by | Owner |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2.1 | Add `'jupyterlab'` to `HostInfo.editor` | `packages/log-core/src/events.ts` | S | — | Already approved; just not done (B7) | |
+| 2.2 | `view` field on `DocOpenPayload`, `ipynb-source-v1` projection, test vectors | `packages/log-core` | M | — | Request 1 and edge cases, request 2 (B1, B2) | |
+| 2.3 | View hash per `.ipynb` in the signed bundle manifest | `packages/log-core` | M | 2.2 | Request 1 | |
+| 2.4 | **Check 8 compares view hashes for notebooks. Deploy before any student uses the recorder** | `packages/analysis-core/src/validation/verify-submitted-code.ts` | M | 2.2, 2.3 | Request 1 | |
+| 2.5 | Export vectors for the text view and `extension_hash`; decide how a `provjup` release hash reaches the allowlist | `tools/export-conformance-vectors.ts`, `scripts/update-extension-hash-allowlist.mjs` | M | 2.2 | Request 3 | |
+| 2.6 | Treat `nbgitpuller` updates like git when explaining external changes | `packages/analysis-core/src/index/classify-external-changes.ts` | M | — | Owner agreement | |
+| 2.7 | Show replayed notebook views as cells | `packages/analyzer/src/views/replay/` | L | 2.2 | Owner agreement (UI only, no format change) | |
+| 2.8 | Add each `provjup` release's hash to the allowlist | `packages/analysis-core/src/heuristics/config/known-good-extension-hashes.json` | S | 2.5, a release | — | |
+| 2.9 | `/architecture`: add the JupyterLab recorder to the ecosystem and roadmap diagrams | `tools/architecture/dot/`, `packages/analyzer/src/views/architecture/content/nodes/` | M | — | Owner agreement | |
+| 2.10 | Allow the home-directory secret rule for browser-hosted recorders | `docs/key-management.md` §4.4 and §9 | S | — | Request 4 | |
+| 2.11 | `honeypot_similarity` heuristic and staff-only honeypot storage | `analysis-core`, `analyzer` or `server` | L | — | Decision 9; after v1 | |
+
+**Details:**
+
+- **2.1** is the smallest and unblocks a correct `session.start`: once it lands, `provjup`
+  switches from the older `vscode` block to `host.editor: 'jupyterlab'`
+  (`src/recorder/session/recorder-context.ts`).
+- **2.2** pins the projection in `log-core` with vectors, replacing this repo's draft in
+  `src/notebook/text-view.ts`. Settle the edge cases in request 2 first: notebooks before
+  nbformat 4.5, lines that look like cell boundaries, and `
+`.
+- **2.4 is the critical one.** Students submit the `.ipynb` with outputs, whose bytes never
+  match the recording. Check 8 must compare the view hash for `view`-tagged paths instead. Old
+  analyzers without this change would flag every notebook submission, so it ships first.
+- **2.5:** `update-hashes` sorts paths with `localeCompare`, while `provjup` will use byte order.
+  The owner decides how a `provjup` hash is computed and added.
+- **2.6:** DataHub distributes assignments with `nbgitpuller`; its updates should be explained,
+  not flagged.
+- **2.7** was part of Task 10, but notebook replay needs it whether or not `cell.execute` is ever
+  approved. Split the replayed text on the `# %% [type] id=` headers and render each block as a
+  cell. Do not re-render outputs; they are not recorded.
+- **2.9** is required by the monorepo's `CLAUDE.md` for any new recorder.
 
 ## Task details
 
@@ -260,8 +316,9 @@ built. The staff guide must cover: provisional seals, staff access to the identi
 
 ### Task 10: Cell runs (on hold)
 
-A `cell.execute` event and a cell view in the analyzer. Waits on decisions 1 and 10 and on
-monorepo approval, because it changes the log format. Do not start.
+A `cell.execute` event, and run markers in the analyzer's replay. Waits on decisions 1 and 10
+and on monorepo approval, because it changes the log format. Do not start. The analyzer's cell
+view is not part of this: it is task 2.7.
 
 ## Not code: outreach
 
@@ -269,7 +326,7 @@ These are for the project owner, but anyone can help draft them.
 
 | Item | Status |
 | --- | --- |
-| Send [`monorepo-owner-requests.md`](monorepo-owner-requests.md); also ask about B7 (`'jupyterlab'` in `HostInfo.editor`) | Not sent |
+| Send [`monorepo-owner-requests.md`](monorepo-owner-requests.md); also ask about B7 (`'jupyterlab'` in `HostInfo.editor`) and Task 2 as a whole | Not sent |
 | Email Data 100 at `data100.instructors@berkeley.edu` (questions in `project-status.md`) | Not sent |
 | Find contacts for Data 101 and 102 | Not started |
 | Ask DataHub support: course images, whether `~/.local/share/jupyter` persists, staff role scope | Not sent |
