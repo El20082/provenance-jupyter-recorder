@@ -78,6 +78,20 @@ install it in the image. `extension_hash` covers the installed labextension tree
 See "Required monorepo changes" in the README. Unlike `provnvim` and `provjet`, this
 recorder needs format additions, which require approval and must ship analyzer-first.
 
+**Analyzer notebook viewer (decided 2026-11-13).** The analyzer shows replayed notebooks with
+JupyterLab's own open-source notebook components (BSD-3-Clause), embedded in its replay view the
+way Monaco is embedded today (`packages/analyzer/src/views/replay/MonacoMount.tsx`, lazy-loaded).
+Notebooks then look in the analyzer as they did to the student. Consequences for the recorder:
+
+- The view must be parsable back into cells. log-core gains a parser alongside the projection,
+  shared by both sides, and the look-alike header edge case must be settled so that a cell
+  containing a line like `# %% [code] id=…` is never split in two.
+- Cell ids must stay unique and stable for the life of a notebook; the recorder already refuses
+  notebooks without them.
+- Outputs are not recorded, so the viewer shows code and Markdown only.
+- The view records no kernel language. The target courses use Python, so the viewer defaults to
+  Python highlighting; recording the language would be a format change.
+
 ## 9. Build sequence
 
 1. Approve the monorepo format additions; add `log-core` delivery.
