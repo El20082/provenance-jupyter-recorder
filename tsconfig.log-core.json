@@ -1,0 +1,12 @@
+{
+  "//": "Builds vendor/provenance/packages/log-core to its dist/ without its test files, which need monorepo-only dev dependencies. Does not modify the submodule's tracked files.",
+  "extends": "./vendor/provenance/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./vendor/provenance/packages/log-core/src",
+    "outDir": "./vendor/provenance/packages/log-core/dist",
+    "declarationMap": false,
+    "sourceMap": false
+  },
+  "include": ["vendor/provenance/packages/log-core/src/**/*.ts"],
+  "exclude": ["vendor/provenance/packages/log-core/src/**/*.test.ts"]
+}

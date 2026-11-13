@@ -11,13 +11,27 @@
     "schema/**/*",
     "style/**/*"
   ],
+  "scripts": {
+    "build:core": "tsc -p tsconfig.log-core.json",
+    "prepare": "npm run build:core",
+    "typecheck": "npm run build:core && tsc -p tsconfig.json",
+    "test": "npm run build:core && node scripts/vitest.mjs run",
+    "lint": "eslint src tests && prettier --check src tests",
+    "format": "prettier --write src tests"
+  },
   "jupyterlab": {
     "extension": true,
     "schemaDir": "schema",
     "outputDir": "provjup/labextension"
   },
-
   "dependencies": {
-  "@provenance/log-core": "file:vendor/provenance/packages/log-core"
+    "@provenance/log-core": "file:vendor/provenance/packages/log-core"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.5",
+    "prettier": "^3.10.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^4.1.12"
   }
 }
