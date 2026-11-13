@@ -2,7 +2,7 @@
   "name": "provjup",
   "version": "0.0.0",
   "private": true,
-  "description": "JupyterLab recorder for Provenance. Skeleton only.",
+  "description": "JupyterLab recorder for Provenance.",
   "license": "Apache-2.0",
   "type": "module",
   "main": "lib/index.js",
@@ -11,13 +11,39 @@
     "schema/**/*",
     "style/**/*"
   ],
+  "scripts": {
+    "build:core": "tsc -p tsconfig.log-core.json",
+    "build:lib": "tsc -p tsconfig.build.json",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build": "npm run build:core && npm run build:lib && npm run build:labextension:dev",
+    "build:prod": "npm run build:core && npm run build:lib && npm run build:labextension",
+    "prepare": "npm run build:core",
+    "typecheck": "npm run build:core && tsc -p tsconfig.json",
+    "test": "npm run build:core && node scripts/vitest.mjs run",
+    "lint": "eslint src tests && prettier --check src tests",
+    "format": "prettier --write src tests"
+  },
   "jupyterlab": {
     "extension": true,
     "schemaDir": "schema",
     "outputDir": "provjup/labextension"
   },
-
   "dependencies": {
-  "@provenance/log-core": "file:vendor/provenance/packages/log-core"
-  }
+    "@jupyterlab/application": "^4.4.0",
+    "@provenance/log-core": "file:vendor/provenance/packages/log-core"
+  },
+  "devDependencies": {
+    "@jupyterlab/builder": "^4.4.0",
+    "eslint": "^9.39.5",
+    "prettier": "^3.10.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^4.1.12"
+  },
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ]
 }

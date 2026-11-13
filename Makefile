@@ -1,4 +1,24 @@
-.PHONY: vectors
+.PHONY: install build test typecheck lint format vectors
+
+# Install JavaScript dependencies and build the vendored log-core.
+install:
+	npm install
+
+# Build the frontend and the prebuilt labextension. Needs JupyterLab on PATH.
+build:
+	npm run build
+
+test:
+	npm test
+
+typecheck:
+	npm run typecheck
+
+lint:
+	npm run lint
+
+format:
+	npm run format
 
 # Regenerate golden conformance vectors from the Provenance monorepo.
 # path-scope-vectors.json is a verbatim copy; the exporter does not produce it.
