@@ -59,7 +59,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | 7 | Checkpoints, recovery, rolling seal, auto-save on cell run | After Task 6 |
 | 8 | Terminal, git, peer witnessing, identity, enrollment | After Task 7 |
 | 9 | Real tests in Data 100, 101 and 102; release; guides; local demo | After Task 8, with check 8 deployed |
-| 10 | Cell runs and the analyzer's cell view | Only if decisions 1 and 10 are approved |
+| 10 | Cell runs (`cell.execute`) with an output digest, shown in the analyzer | Decided; waits on monorepo approval (request 6) |
 
 ### Outreach and setup
 
@@ -96,6 +96,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | 13 | Vitest, ESLint and Prettier |
 | 14 | `watchdog` for file watching, with a slow polling safety net |
 | 15 | The analyzer shows replayed notebooks with JupyterLab's own notebook components, embedded in its replay view the way Monaco is |
+| 1, 10 | Record each cell run as a new `cell.execute` event, with a digest of its outputs, never their content |
 | — | Students install, enroll once, and create the Otter zip. Nothing else |
 | — | Contributor tracking is required |
 | — | Every cell run auto-saves the notebook; every heartbeat is logged |
@@ -107,7 +108,6 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 
 | # | Decision | Recommendation |
 | --- | --- | --- |
-| 1, 10 | Record cell runs and output details? | One `cell.execute` event, with only a hash and size of outputs. Format change, needs approval |
 | 6 | Real-time collaboration | Require it disabled for v1 |
 | 7 | Shared VS Code helpers | Move them into a shared package if the monorepo owner agrees |
 | 9 | Honeypot matching | After v1 |

@@ -43,8 +43,10 @@ and never blocks recording.
 
 ### What it does not record
 
-- **Cell outputs, execution counts, kernel activity, notebook metadata.** Only cell
-  *sources* are recorded (see [Notebook text view](#notebook-text-view-ipynb-source-v1)).
+- **Output content, kernel activity, notebook metadata.** Cell *sources* are recorded (see
+  [Notebook text view](#notebook-text-view-ipynb-source-v1)). Cell runs are recorded as
+  `cell.execute` once log-core adds it, with a digest of their outputs (hashes, sizes and
+  output types) but never the outputs themselves.
 - Anything outside an activated assignment folder.
 - Anything over the network. The frontend talks only to its own Jupyter server
   (recorder PRD NG2).
@@ -114,7 +116,8 @@ view(nb) = concat over cells, in notebook order, of:
 - `cell_type` ∈ `code | markdown | raw`; `cell_id` is the nbformat ≥ 4.5 cell `id`.
 - `source` is the cell source as a single string (nbformat's line array joined).
 - A notebook with zero cells has the empty string as its view.
-- Outputs, `execution_count`, cell and notebook metadata, and attachments are **excluded**.
+- Outputs, `execution_count`, cell and notebook metadata, and attachments are **excluded** from
+  the view. Runs and their output digests are a separate event, `cell.execute`.
 
 Unresolved edge cases: notebooks older than format 4.5 (no cell ids), markdown lines
 that begin with `# %%`, and `\r\n` inside cell sources.
@@ -285,6 +288,8 @@ items need explicit approval.
 10. `analyzer` or `server`: add staff-only storage and editing for each assignment's
     honeypot answers.
 11. `docs/key-management.md`: allow the home-directory secret rule for hub-hosted recorders.
+12. `log-core`: a `cell.execute` event for cell runs, with an output digest *(decided here;
+    needs approval)*. The analyzer shows run markers and output changes in the notebook viewer.
 
 ---
 
@@ -297,7 +302,8 @@ dependencies are approved and the real build exists.
 
 ## Open decisions
 
-1. **Outputs and execution (reopened):** whether to record cell runs and output digests. See the plan.
+1. **Outputs and execution (decided):** record each cell run as `cell.execute`, with a digest of
+   its outputs and never their content. Needs monorepo approval (request 6).
 2. **Deployment target (decided):** DataHub first, piloted on Data 100, then Data 101 and Data 102; local Jupyter is a v1 demo.
 3. **Student secret storage (decided):** a `0600` file in the home directory, outside every
    assignment folder. This replaces key-management §4.4's "never leaves the student's
