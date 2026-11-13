@@ -95,6 +95,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | 12 | Data 100 is the first pilot |
 | 13 | Vitest, ESLint and Prettier |
 | 14 | `watchdog` for file watching, with a slow polling safety net |
+| 16 | Approved dependencies: `watchdog`, `@jupyterlab/statusbar`, `@jupyterlab/apputils` (#54) |
 | 7 | The VS Code recorder's pure helpers are imported from the submodule like log-core, never copied |
 | 6 | Real-time collaboration must be off for v1; the recorder refuses to record while it is on (#51). Group work is a separate future project, highlighted in `docs/team-tasks.md` |
 | 15 | The analyzer shows replayed notebooks with JupyterLab's own notebook components, embedded in its replay view the way Monaco is |
@@ -130,6 +131,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 1. How does a package get into a course image?
 2. Does `~/.local/share/jupyter` persist between servers?
 3. What exactly can the course-staff role access?
+4. Can `watchdog` be added to the course images? `provjup` installs it.
 
 ### For the monorepo owner
 

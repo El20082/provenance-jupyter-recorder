@@ -64,7 +64,7 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 | 6.2 | Focus and selection events | S | 5.2, 5.3 | — | #23 |
 | 6.0 | Import VS Code recorder helpers from the submodule (decision 7) | S | — | — | #52 |
 | 6.3 | Paste detection | L | 5.2, 5.3, 6.0 | — | #24 |
-| 6.4 | External changes on disk | L | 5.2, 6.0 | Dependency approval (`watchdog`) | #25 |
+| 6.4 | External changes on disk | L | 5.2, 6.0 | — | #25 |
 | 6.5 | Check DataHub idle shutdown | S | — | — | #26 |
 | 7.1 | `.slog.meta` and atomic writes | M | — | — | #27 |
 | 7.2 | Signed checkpoints | M | 7.1 | — | #28 |
@@ -258,7 +258,7 @@ signal without discussion.
 **6.4 External changes on disk.** Changes made outside the editor (a terminal, `!cmd`, `%load`)
 become `fs.external_change`.
 - Server: `provjup/watch/fs_watcher.py` (stub) with `watchdog`, plus a slow polling safety net
-  (decision 14). Adding `watchdog` needs dependency approval first.
+  (decision 14). `watchdog` is approved and added (#54).
 - Frontend: `src/recorder/watch/*`, `src/recorder/state/expected-content*.ts`,
   `src/recorder/events/external-change-*.ts`, `explanation-tags.ts` (stubs).
 - VS Code: `wiring/fs-watcher.ts`, `events/external-change-detector.ts`, `state/`.
@@ -315,7 +315,7 @@ for example a `BroadcastChannel` lock.
 **7.7 Degraded mode and status item.** Report a failed disk or write without stopping recording,
 and show a "Provenance: recording" status item.
 - Files: `src/recorder/failure/*`, `src/recorder/activation/status-bar.ts`, `recorder-state.ts`
-  (stubs). Needs `@jupyterlab/statusbar` (dependency approval). Build the item from code with
+  (stubs). Uses `@jupyterlab/statusbar` and `@jupyterlab/apputils`, approved and added (#54). Build the item from code with
   JupyterLab's status-bar styling and theme variables; `style/` was removed (#53) and comes back only
   if the item truly needs CSS.
 - VS Code: `failure/disk-full-handler.ts`, `activation/status-bar.ts`.
@@ -404,7 +404,7 @@ These are for the project owner, but anyone can help draft them.
 | Send [`monorepo-owner-requests.md`](monorepo-owner-requests.md); also ask about B7 (`'jupyterlab'` in `HostInfo.editor`) and Task 2 as a whole | Not sent |
 | Email Data 100 at `data100.instructors@berkeley.edu` (questions in `project-status.md`) | Not sent |
 | Find contacts for Data 101 and 102 | Not started |
-| Ask DataHub support: course images, whether `~/.local/share/jupyter` persists, staff role scope | Not sent |
+| Ask DataHub support: course images, whether `~/.local/share/jupyter` persists, staff role scope, and adding `watchdog` to the images | Not sent |
 | Merge PRs #2 to #6 | Waiting on review |
 
 ## Open issues and decisions
