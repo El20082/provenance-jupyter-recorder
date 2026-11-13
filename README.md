@@ -274,7 +274,9 @@ items need explicit approval.
    **Deploy before any Jupyter recorder ships**, or old analyzers will report false
    "edited outside the recording" mismatches.
 5. `analysis-core`: treat `nbgitpuller` updates like git for external-change explanations.
-6. `analyzer`: render replayed `ipynb-source-v1` text as cells (UI only).
+6. `analyzer`: show replayed notebooks with JupyterLab's own notebook components, embedded in
+   the replay view the way Monaco is *(decided; new analyzer dependencies need approval)*.
+   `log-core` also gains a parser from the view back to cells, shared with the recorder.
 7. `/architecture`: ecosystem and roadmap diagrams, plus node details.
 8. `known-good-extension-hashes.json`: add each release's hash.
 9. `analysis-core`: add the `honeypot_similarity` heuristic and register it in

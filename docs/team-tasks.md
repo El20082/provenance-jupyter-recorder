@@ -39,44 +39,44 @@ merged, branch from `scaffold/initial`.
 - **Commits:** conventional prefixes (`feat:`, `fix:` …), `git commit --no-gpg-sign`, one task
   per pull request, and a progress note in `docs/plans/` for anything larger than a day.
 
-**To claim a task,** put your name in its Owner column in a small pull request, or tell the
-project owner.
+**Every task has a GitHub issue,** linked in the Issue column below. **To claim a task,** assign
+yourself on its issue. Issues start unassigned. Discuss the work and link your pull request there.
 
 ## Task list
 
 Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 
-| ID | Task | Size | Depends on | Blocked by | Owner |
+| ID | Task | Size | Depends on | Blocked by | Issue |
 | --- | --- | --- | --- | --- | --- |
-| **2** | **Analyzer and monorepo changes: a separate big task, see below** | **L** | — | **Monorepo owner** | |
-| 5.1 | Route paths to sessions | S | — | — | |
-| 5.2 | Connect notebook edits to the recorder | M | 5.1 | — | |
-| 5.3 | Record plain text files | M | 5.1 | — | |
-| 6.1 | Heartbeats that survive hidden tabs | M | — | — | |
-| 6.2 | Focus and selection events | S | 5.2, 5.3 | — | |
-| 6.3 | Paste detection | L | 5.2, 5.3 | Decision 7 | |
-| 6.4 | External changes on disk | L | 5.2 | Dependency approval (`watchdog`) | |
-| 6.5 | Check DataHub idle shutdown | S | — | — | |
-| 7.1 | `.slog.meta` and atomic writes | M | — | — | |
-| 7.2 | Signed checkpoints | M | 7.1 | — | |
-| 7.3 | Chain recovery after a reload | M | 7.1 | — | |
-| 7.4 | Rolling seal and `extension_hash` | L | 7.2 | Monorepo request 3 | |
-| 7.5 | Save, flush and seal on every cell run | S | 5.2, 7.4 | — | |
-| 7.6 | One writer per session across tabs | M | — | Design not decided | |
-| 7.7 | Degraded mode and status item | M | — | B5 | |
-| 7.8 | Remove the seal-command stubs | S | — | — | |
-| 8.1 | Terminal commands | M | 5.1 | — | |
-| 8.2 | Git events | M | 5.1 | — | |
-| 8.3 | Peer witnessing | M | 6.4 | — | |
-| 8.4 | Identity and enrollment | L | 7.1 | Monorepo request 4 (wording) | |
-| 8.5 | Extension snapshot and activation events | S | — | — | |
-| 9.1 | End-to-end test in real JupyterLab | M | 7.4 | Dependency approval (Galata) | |
-| 9.2 | Test on JupyterLab 4.4.5 | S | — | — | |
-| 9.3 | Otter to Gradescope to `provgate` run | M | 7.4 | Course contact | |
-| 9.4 | Data 100 image, then 101 and 102 | M | 9.1 | DataHub support answers | |
-| 9.5 | Local Jupyter demo | S | 7.4 | — | |
-| 9.6 | Guides: student, staff, hub, releasing | M | 9.3 | — | |
-| 10 | Cell runs (`cell.execute`) | L | 5.2, 2.7 | Decisions 1 and 10, monorepo approval | |
+| **2** | **Analyzer and monorepo changes: a separate big task, see below** | **L** | — | **Monorepo owner** | #10 |
+| 5.1 | Route paths to sessions | S | — | — | — (done in the Task 5 PR) |
+| 5.2 | Connect notebook edits to the recorder | M | 5.1 | — | — (done in the Task 5 PR) |
+| 5.3 | Record plain text files | M | 5.1 | — | — (done in the Task 5 PR) |
+| 6.1 | Heartbeats that survive hidden tabs | M | — | — | #22 |
+| 6.2 | Focus and selection events | S | 5.2, 5.3 | — | #23 |
+| 6.3 | Paste detection | L | 5.2, 5.3 | Decision 7 | #24 |
+| 6.4 | External changes on disk | L | 5.2 | Dependency approval (`watchdog`) | #25 |
+| 6.5 | Check DataHub idle shutdown | S | — | — | #26 |
+| 7.1 | `.slog.meta` and atomic writes | M | — | — | #27 |
+| 7.2 | Signed checkpoints | M | 7.1 | — | #28 |
+| 7.3 | Chain recovery after a reload | M | 7.1 | — | #29 |
+| 7.4 | Rolling seal and `extension_hash` | L | 7.2 | Monorepo request 3 | #30 |
+| 7.5 | Save, flush and seal on every cell run | S | 5.2, 7.4 | — | #31 |
+| 7.6 | One writer per session across tabs | M | — | Design not decided | #32 |
+| 7.7 | Degraded mode and status item | M | — | B5 | #33 |
+| 7.8 | Remove the seal-command stubs | S | — | — | #34 |
+| 8.1 | Terminal commands | M | 5.1 | — | #35 |
+| 8.2 | Git events | M | 5.1 | — | #36 |
+| 8.3 | Peer witnessing | M | 6.4 | — | #37 |
+| 8.4 | Identity and enrollment | L | 7.1 | Monorepo request 4 (wording) | #38 |
+| 8.5 | Extension snapshot and activation events | S | — | — | #39 |
+| 9.1 | End-to-end test in real JupyterLab | M | 7.4 | Dependency approval (Galata) | #40 |
+| 9.2 | Test on JupyterLab 4.4.5 | S | — | — | #41 |
+| 9.3 | Otter to Gradescope to `provgate` run | M | 7.4 | Course contact | #42 |
+| 9.4 | Data 100 image, then 101 and 102 | M | 9.1 | DataHub support answers | #43 |
+| 9.5 | Local Jupyter demo | S | 7.4 | — | #44 |
+| 9.6 | Guides: student, staff, hub, releasing | M | 9.3 | — | #45 |
+| 10 | Cell runs (`cell.execute`) | L | 5.2, 2.7 | Decisions 1 and 10, monorepo approval | #46 |
 
 Outreach that is not code is at the end.
 
@@ -92,19 +92,19 @@ Outreach that is not code is at the end.
 >
 > The requests waiting on the owner are in [`monorepo-owner-requests.md`](monorepo-owner-requests.md).
 
-| ID | Change | Where in the monorepo | Size | Depends on | Blocked by | Owner |
+| ID | Change | Where in the monorepo | Size | Depends on | Blocked by | Issue |
 | --- | --- | --- | --- | --- | --- | --- |
-| 2.1 | Add `'jupyterlab'` to `HostInfo.editor` | `packages/log-core/src/events.ts` | S | — | Already approved; just not done (B7) | |
-| 2.2 | `view` field on `DocOpenPayload`, `ipynb-source-v1` projection, test vectors | `packages/log-core` | M | — | Request 1 and edge cases, request 2 (B1, B2) | |
-| 2.3 | View hash per `.ipynb` in the signed bundle manifest | `packages/log-core` | M | 2.2 | Request 1 | |
-| 2.4 | **Check 8 compares view hashes for notebooks. Deploy before any student uses the recorder** | `packages/analysis-core/src/validation/verify-submitted-code.ts` | M | 2.2, 2.3 | Request 1 | |
-| 2.5 | Export vectors for the text view and `extension_hash`; decide how a `provjup` release hash reaches the allowlist | `tools/export-conformance-vectors.ts`, `scripts/update-extension-hash-allowlist.mjs` | M | 2.2 | Request 3 | |
-| 2.6 | Treat `nbgitpuller` updates like git when explaining external changes | `packages/analysis-core/src/index/classify-external-changes.ts` | M | — | Owner agreement | |
-| 2.7 | Show replayed notebook views as cells | `packages/analyzer/src/views/replay/` | L | 2.2 | Owner agreement (UI only, no format change) | |
-| 2.8 | Add each `provjup` release's hash to the allowlist | `packages/analysis-core/src/heuristics/config/known-good-extension-hashes.json` | S | 2.5, a release | — | |
-| 2.9 | `/architecture`: add the JupyterLab recorder to the ecosystem and roadmap diagrams | `tools/architecture/dot/`, `packages/analyzer/src/views/architecture/content/nodes/` | M | — | Owner agreement | |
-| 2.10 | Allow the home-directory secret rule for browser-hosted recorders | `docs/key-management.md` §4.4 and §9 | S | — | Request 4 | |
-| 2.11 | `honeypot_similarity` heuristic and staff-only honeypot storage | `analysis-core`, `analyzer` or `server` | L | — | Decision 9; after v1 | |
+| 2.1 | Add `'jupyterlab'` to `HostInfo.editor` | `packages/log-core/src/events.ts` | S | — | Already approved; just not done (B7) | #11 |
+| 2.2 | `view` field on `DocOpenPayload`, `ipynb-source-v1` projection, test vectors | `packages/log-core` | M | — | Request 1 and edge cases, request 2 (B1, B2) | #12 |
+| 2.3 | View hash per `.ipynb` in the signed bundle manifest | `packages/log-core` | M | 2.2 | Request 1 | #13 |
+| 2.4 | **Check 8 compares view hashes for notebooks. Deploy before any student uses the recorder** | `packages/analysis-core/src/validation/verify-submitted-code.ts` | M | 2.2, 2.3 | Request 1 | #14 |
+| 2.5 | Export vectors for the text view and `extension_hash`; decide how a `provjup` release hash reaches the allowlist | `tools/export-conformance-vectors.ts`, `scripts/update-extension-hash-allowlist.mjs` | M | 2.2 | Request 3 | #15 |
+| 2.6 | Treat `nbgitpuller` updates like git when explaining external changes | `packages/analysis-core/src/index/classify-external-changes.ts` | M | — | Owner agreement | #16 |
+| 2.7 | **JupyterLab-based notebook viewer in replay** (decided 2026-11-13) | `packages/analyzer/src/views/replay/` | L | 2.2 | Owner agreement (new UI dependencies) | #17 |
+| 2.8 | Add each `provjup` release's hash to the allowlist | `packages/analysis-core/src/heuristics/config/known-good-extension-hashes.json` | S | 2.5, a release | — | #18 |
+| 2.9 | `/architecture`: add the JupyterLab recorder to the ecosystem and roadmap diagrams | `tools/architecture/dot/`, `packages/analyzer/src/views/architecture/content/nodes/` | M | — | Owner agreement | #19 |
+| 2.10 | Allow the home-directory secret rule for browser-hosted recorders | `docs/key-management.md` §4.4 and §9 | S | — | Request 4 | #20 |
+| 2.11 | `honeypot_similarity` heuristic and staff-only honeypot storage | `analysis-core`, `analyzer` or `server` | L | — | Decision 9; after v1 | #21 |
 
 **Details:**
 
@@ -122,9 +122,28 @@ Outreach that is not code is at the end.
   The owner decides how a `provjup` hash is computed and added.
 - **2.6:** DataHub distributes assignments with `nbgitpuller`; its updates should be explained,
   not flagged.
-- **2.7** was part of Task 10, but notebook replay needs it whether or not `cell.execute` is ever
-  approved. Split the replayed text on the `# %% [type] id=` headers and render each block as a
-  cell. Do not re-render outputs; they are not recorded.
+- **2.7, decided 2026-11-13:** the analyzer shows replayed notebooks with JupyterLab's own open-source notebook components, embedded in its replay view the way Monaco is embedded today
+  (`packages/analyzer/src/views/replay/MonacoMount.tsx`, lazy-loaded as its own chunk). Notebooks
+  then look in the analyzer as they did to the student. JupyterLab's packages are BSD-3-Clause.
+  Suggested steps:
+  1. **Spike first:** mount a read-only JupyterLab notebook (Lumino widgets inside React) behind
+     `React.lazy`, measure bundle size and load time, list the exact `@jupyterlab/*` packages,
+     and report back before building further.
+  2. **Model from the view:** turn the replayed view into cells with log-core's view parser
+     (2.2), and update the notebook model incrementally as `doc.change` events apply.
+  3. **Read-only rendering:** highlighted code cells and rendered Markdown. No kernel, no
+     editing, no outputs, which are not recorded.
+  4. **Port the replay overlays** now on Monaco (gutter decorations, line hover, cursor marker,
+     contributor ribbons) onto each cell's CodeMirror editor, using the parser's mapping from
+     view line to cell and line.
+  5. **Keep Monaco for every other file type;** only `view`-tagged `.ipynb` paths use the viewer.
+
+  Needs the monorepo owner's approval for the new analyzer dependencies, their license notices
+  and the bundle size. It was part of Task 10, but notebook replay needs it either way.
+- **2.2 now includes the view's parser,** the inverse of the projection, so the analyzer and the
+  recorder agree on where cells start. This makes the look-alike header edge case (request 2)
+  matter for correctness, not only display: a cell containing a line like `# %% [code] id=…`
+  would otherwise be split in two by the viewer.
 - **2.9** is required by the monorepo's `CLAUDE.md` for any new recorder.
 
 ## Task details

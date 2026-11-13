@@ -95,6 +95,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | 12 | Data 100 is the first pilot |
 | 13 | Vitest, ESLint and Prettier |
 | 14 | `watchdog` for file watching, with a slow polling safety net |
+| 15 | The analyzer shows replayed notebooks with JupyterLab's own notebook components, embedded in its replay view the way Monaco is |
 | — | Students install, enroll once, and create the Otter zip. Nothing else |
 | — | Contributor tracking is required |
 | — | Every cell run auto-saves the notebook; every heartbeat is logged |

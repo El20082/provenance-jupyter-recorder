@@ -13,6 +13,7 @@ students use the recorder.
 | 2 | Text-view edge cases | Format decision | Before item 1 is finalized |
 | 3 | `extension_hash` vectors | Test vectors | Task 7 |
 | 4 | Secret rule wording | Security policy | Before student use |
+| 5 | Analyzer notebook viewer built from JupyterLab | New analyzer dependencies | Before students' notebooks are reviewed |
 
 `HostInfo.editor` gaining `'jupyterlab'` is already approved and is not repeated here.
 
@@ -54,7 +55,7 @@ before the format is finalized.
 | Case | Problem | Recommendation |
 | --- | --- | --- |
 | Notebooks older than format 4.5 | They have no cell ids, which the view requires | Require 4.5 or later for assignments; staff control this when creating them |
-| A cell containing a line like `# %% [code] id=x` | It looks like a cell boundary, so the analyzer could display cells wrongly | Hashes are unaffected. Fix display only, by splitting on the exact pattern |
+| A cell containing a line like `# %% [code] id=x` | It looks like a cell boundary. With the JupyterLab viewer (request 5), the analyzer would split that cell in two | Hashes are unaffected. The view parser must split only on headers whose id is a known cell id, or the projection must make headers unambiguous. Decide before the format is pinned |
 | `\r\n` inside a cell | Line endings produce different hashes for the same text | Convert to `\n` inside the projection function |
 
 **Approval needed:** the three answers above, or better ones.
@@ -105,6 +106,29 @@ with Google as they do in VS Code.
   directories, so they could read the file and sign as that student.
 
 **Approval needed:** updated §4.4 and §9 wording, and acceptance of these weaknesses.
+
+## 5. Analyzer notebook viewer built from JupyterLab
+
+**Decided by the project owner (2026-11-13):** the analyzer shows replayed notebooks with
+JupyterLab's own open-source notebook components (BSD-3-Clause), embedded in the replay view the
+way Monaco is embedded today (`packages/analyzer/src/views/replay/MonacoMount.tsx`, lazy-loaded as
+its own chunk). Notebooks then look in the analyzer as they did to the student.
+
+**What this needs from the monorepo:**
+
+- **New analyzer dependencies:** JupyterLab notebook, CodeMirror and rendermime packages, and
+  Lumino. The exact list comes from a spike; they are lazy-loaded so only notebook replay pays
+  for them. License notices are needed.
+- **A view parser in log-core,** the inverse of the `ipynb-source-v1` projection, with vectors, so
+  the analyzer and the recorder agree on cell boundaries (request 1).
+- **The replay overlays** (gutter decorations, line hover, cursor marker, contributor ribbons)
+  ported from Monaco onto each cell's CodeMirror editor.
+
+No format change is needed beyond request 1. Outputs are not recorded, so the viewer shows code
+and Markdown only, and defaults to Python highlighting because the view records no kernel
+language.
+
+**Approval needed:** the new analyzer dependencies and their bundle size.
 
 ## Related, not requested yet
 
