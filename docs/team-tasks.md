@@ -12,6 +12,10 @@ things stand see [`project-status.md`](project-status.md).
 > happens in the `provenance` monorepo, not here, and most of it needs the monorepo owner's
 > approval first. See [Task 2](#task-2-analyzer-and-monorepo-changes).
 
+> [!NOTE]
+> **Group work is a separate future project,** not part of the v1 tasks. See
+> [Group work](#group-work-a-separate-future-project).
+
 ## Before you start
 
 **Read first:** [`CLAUDE.md`](../CLAUDE.md) (the repo's rules), [`design.md`](design.md), and the
@@ -153,6 +157,34 @@ Outreach that is not code is at the end.
   matter for correctness, not only display: a cell containing a line like `# %% [code] id=…`
   would otherwise be split in two by the viewer.
 - **2.9** is required by the monorepo's `CLAUDE.md` for any new recorder.
+
+## Group work: a separate future project
+
+> [!IMPORTANT]
+> **A separate big project, after v1. Not tracked as an issue yet, and not part of the v1 tasks.**
+> Decided 2026-11-13 (decision 6): for v1, real-time collaboration must be off, and the recorder
+> refuses to record while it is on (task 5.4, #51). Supporting group work properly is its own
+> project, planned separately once v1 ships. Do not start it inside a v1 task.
+
+**What it would cover:**
+
+- **Real-time collaboration in JupyterLab** (`jupyter-collaboration`): recording every
+  collaborator's edits, each attributed to the right person, instead of refusing to record.
+- **Per-person attribution:** every collaborator needs a verified identity, through enrollment
+  (8.4), and each edit needs to say who made it. That is likely a log format change in log-core,
+  so it goes to the monorepo owner first.
+- **Shared assignment folders and repositories:** partners' logs side by side in `.provenance/`,
+  building on peer witnessing (8.3).
+- **Group submissions** through Otter and Gradescope, where one submission has several students.
+- **The analyzer:** showing who wrote what in the notebook viewer (2.7), building on its existing
+  contributor ribbons.
+
+**What already exists to build on:** Provenance already has contributor tracking by `student_ref`,
+peer witnessing, and a `collaboration: 'group'` setting in Manifest 2.0. The VS Code recorder
+supports partners sharing a git repository, and the analyzer reconciles their logs.
+
+**Courses this unlocks:** any course with live group work, including Data 8, whose image installs
+`jupyter-collaboration`.
 
 ## Task details
 
