@@ -60,7 +60,7 @@ before the format is finalized.
 | --- | --- | --- |
 | Notebooks older than format 4.5 | They have no cell ids, which the view requires | **Decided (2026-11-13): a hard limit.** Provenance supports nbformat 4.5 or later only; staff control this when creating assignments |
 | A cell containing a line like `# %% [code] id=x` | It looks like a cell boundary. With the JupyterLab viewer (request 5), the analyzer would split that cell in two | **Decided (2026-11-13): no escaping.** Hashes are unaffected, since both sides build the same text. The view parser treats only lines that exactly match the header format as headers; in the rare case of a lookalike line, the viewer may show one cell as two. Escaping would make the logged text differ from what the student typed and turn single keystrokes into extra edits |
-| `\r\n` inside a cell | Line endings produce different hashes for the same text | **Tested 2026-11-13 (see below). Recommended: no conversion.** Keep `\r` as an ordinary character, and split lines only on `\n`, which is what `analysis-core`'s `applyDocChange` already does. Pin it with a vector containing `\r\n` and a lone `\r` |
+| `\r\n` inside a cell | Line endings produce different hashes for the same text | **Tested 2026-11-13 (see below). Decided by the project owner (2026-11-13): no conversion, accepted as a special case.** Keep `\r` as an ordinary character, and split lines only on `\n`, which is what `analysis-core`'s `applyDocChange` already does. Pin it with a vector containing `\r\n` and a lone `\r` |
 
 **Approval needed:** the three answers above, or better ones.
 
@@ -80,7 +80,9 @@ again, with `provjup` recording:
 
 So converting line endings would make the log differ from the saved file for no gain. The real
 risk is upstream: a starter notebook with `\r\n` in its cells corrupts students' edits. Staff
-should make sure distributed notebooks use `\n` only (staff guide, task 9.6).
+should make sure distributed notebooks use `\n` only (staff guide, task 9.6), and the analyzer
+shows a note when a notebook opened with `\r` in its cells (task 2.7), so reviewers know the
+cause of any misplaced edits.
 
 ## 3. `extension_hash` vectors
 

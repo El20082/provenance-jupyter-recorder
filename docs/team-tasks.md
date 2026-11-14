@@ -160,6 +160,12 @@ Outreach that is not code is at the end.
      contributor ribbons) onto each cell's CodeMirror editor, using the parser's mapping from
      view line to cell and line.
   5. **Keep Monaco for every other file type;** only `view`-tagged `.ipynb` paths use the viewer.
+  6. **Line-ending note (decided 2026-11-13):** if a cell's text in `doc.open` contains `\r`,
+     show a note: "this notebook contained Windows line endings when opened; JupyterLab may
+     have misplaced edits in these cells", naming the cells. JupyterLab applies edits to such
+     cells at the wrong offsets (request 2's test, jupyterlab/jupyterlab#14715), so a reviewer
+     should know the cause before suspecting the student. No format change: the data is
+     already in the log.
 
   Needs the monorepo owner's approval for the new analyzer dependencies, their license notices
   and the bundle size. It was part of Task 10, but notebook replay needs it either way.
@@ -457,7 +463,10 @@ assignment end to end. Waits on DataHub support's answers.
 
 **9.6 Guides.** Student, staff, JupyterHub and release guides in `docs/`, written from what was
 built. The staff guide must cover: provisional seals, staff access to the identity file, the
-`.provenance` placeholder and `files:` entries for Otter Assign.
+`.provenance` placeholder and `files:` entries for Otter Assign, and **line endings:**
+distributed notebooks must use `\n` only, never Windows `\r\n`. JupyterLab misplaces
+students' edits in cells that contain `\r` (request 2's test), so give staff a one-line check,
+such as searching the notebook file for `\r`, to run before release.
 
 ### Task 10: Cell runs
 
