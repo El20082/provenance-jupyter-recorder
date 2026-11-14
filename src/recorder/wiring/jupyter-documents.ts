@@ -117,6 +117,15 @@ interface DocumentRecorder {
   close(): void;
 }
 
+/**
+ * Records a completed save once the saved file has been read back. A read that fails, by
+ * returning `null` or rejecting, still records the save, with `null` for the text: the wirings
+ * then hash what they hold, as VS Code does when it cannot read a saved file.
+ */
+function recordSave(read: Promise<string | null>, save: (text: string | null) => void): void {
+  read.then(save, () => save(null));
+}
+
 function recordNotebook(
   route: Route,
   serverPath: string,
@@ -161,9 +170,7 @@ function recordNotebook(
 
   const onSaveState = (_: unknown, state: 'started' | 'completed' | 'failed'): void => {
     if (state !== 'completed') return;
-    void readSavedText(serverPath).then((text) => {
-      if (text !== null) wiring.saved(route.path, text);
-    });
+    recordSave(readSavedText(serverPath), (text) => wiring.saved(route.path, text));
   };
   context.saveState.connect(onSaveState);
 
@@ -201,9 +208,7 @@ function recordFile(
 
   const onSaveState = (_: unknown, state: 'started' | 'completed' | 'failed'): void => {
     if (state !== 'completed') return;
-    void readSavedText(serverPath).then((text) => {
-      if (text !== null) wiring.saved(route.path, text);
-    });
+    recordSave(readSavedText(serverPath), (text) => wiring.saved(route.path, text));
   };
   context.saveState.connect(onSaveState);
 

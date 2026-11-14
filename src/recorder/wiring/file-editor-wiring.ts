@@ -50,10 +50,15 @@ export class FileWiring {
     this.emitChange(path, deltas);
   }
 
-  /** The file was saved. `savedText` is the file as written to disk. */
-  saved(path: string, savedText: string): void {
-    if (!this.open.has(path)) return;
-    this.host.emit('doc.save', docSavePayload(path, savedText));
+  /**
+   * The file was saved. `savedText` is the file as written to disk, or `null` when it could not
+   * be read back. A save is always recorded, as in VS Code: an unreadable save carries the hash
+   * of the text held here.
+   */
+  saved(path: string, savedText: string | null): void {
+    const file = this.open.get(path);
+    if (file === undefined) return;
+    this.host.emit('doc.save', docSavePayload(path, savedText ?? file.text));
   }
 
   closed(path: string): void {

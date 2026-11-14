@@ -59,12 +59,16 @@ async function setup(roots = ['data100/hw1']) {
   }
   const notebooks = new FakeTracker<FakeWidget<SharedNotebookLike>>();
   const editors = new FakeTracker<FakeWidget<SharedFileLike>>();
-  const saved = new Map<string, string>();
+  // The saved text per path; an Error makes the read reject, as a failed request would.
+  const saved = new Map<string, string | Error>();
   const documents = connectJupyterDocuments({
     sessions: () => sessions,
     notebooks,
     editors,
-    readSavedText: (path) => Promise.resolve(saved.get(path) ?? null),
+    readSavedText: (path) => {
+      const text = saved.get(path);
+      return text instanceof Error ? Promise.reject(text) : Promise.resolve(text ?? null);
+    },
   });
 
   async function log(index = 0): Promise<readonly HashedEnvelope[]> {
@@ -144,6 +148,19 @@ describe('connectJupyterDocuments: notebooks', () => {
     expect(replay(entries, 'hw1.ipynb')).toBe(textView(finalCells));
     const save = entries.find((e) => e.kind === 'doc.save')!;
     expect(save.data).toEqual({ path: 'hw1.ipynb', sha256: sha256Hex(textView(finalCells)) });
+  });
+
+  it('still records a save whose file cannot be read back', async () => {
+    const env = await setup();
+    const { cells, widget } = await openNotebook(env, 'data100/hw1/hw1.ipynb');
+    cells[0]!.edit([{ retain: cells[0]!.getSource().length }, { insert: '!' }]);
+    widget.context.saveState.emit('completed'); // nothing to read: the read returns null
+    await flush();
+
+    const entries = await env.log();
+    const view = replay(entries, 'hw1.ipynb');
+    const save = entries.find((e) => e.kind === 'doc.save')!;
+    expect(save.data).toEqual({ path: 'hw1.ipynb', sha256: sha256Hex(view) });
   });
 
   it('records nothing until the notebook has loaded', async () => {
@@ -240,6 +257,22 @@ describe('connectJupyterDocuments: text files', () => {
     expect(kinds(entries).filter((k) => k === 'doc.change')).toHaveLength(13);
     expect(replay(entries, 'util.py')).toBe('def f():\n    return 1\n');
     expect(kinds(await env.log(0))).toEqual(['session.start']);
+  });
+
+  it('still records a save when reading the saved file fails', async () => {
+    const env = await setup();
+    const file = new FakeFile('x = 1\n');
+    const context = new FakeContext<SharedFileLike>('data100/hw1/util.py', file);
+    env.editors.add(new FakeWidget(context));
+    await context.load();
+    file.edit([{ retain: file.getSource().length }, { insert: 'y' }]);
+    env.saved.set('data100/hw1/util.py', new Error('network down'));
+    context.saveState.emit('completed');
+    await flush();
+
+    const entries = await env.log();
+    const save = entries.find((e) => e.kind === 'doc.save')!;
+    expect(save.data).toEqual({ path: 'util.py', sha256: sha256Hex('x = 1\ny') });
   });
 
   it('leaves notebooks opened in the text editor to the notebook tracker', async () => {

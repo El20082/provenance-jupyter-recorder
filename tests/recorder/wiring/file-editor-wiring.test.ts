@@ -42,6 +42,14 @@ describe('FileWiring', () => {
     expect(entries[3]!.data).toEqual({ path: 'a.py', sha256: sha256Hex('x = 1\ny = 2') });
   });
 
+  it('still records a save it cannot read back, with the hash of the text it holds', () => {
+    const { entries, wiring } = setup();
+    wiring.opened('a.py', 'x = 1');
+    wiring.saved('a.py', null);
+    expect(entries.map((e) => e.kind)).toEqual(['doc.open', 'doc.save']);
+    expect(entries[1]!.data).toEqual({ path: 'a.py', sha256: sha256Hex('x = 1') });
+  });
+
   it('skips a change it already has, and resynchronizes one that does not line up', () => {
     const { entries, wiring } = setup();
     wiring.opened('a.py', 'abc');

@@ -14,7 +14,7 @@
  * - cell execution and kernel events: not part of the format (decisions 1 and 10).
  */
 
-import type { DocChangeDelta } from '../../core/index';
+import { sha256Hex, type DocChangeDelta } from '../../core/index';
 import {
   cellListDeltas,
   applySourceOps,
@@ -107,12 +107,17 @@ export class NotebookWiring {
     this.emitChange(path, deltas);
   }
 
-  /** The notebook was saved. `savedText` is the file as written to disk. */
-  saved(path: string, savedText: string): void {
-    if (!this.open.has(path)) return;
-    const saved = viewOfSavedNotebook(savedText);
-    if (!saved.ok) return;
-    this.host.emit('doc.save', { path, sha256: saved.sha256 });
+  /**
+   * The notebook was saved. `savedText` is the file as written to disk, or `null` when it could
+   * not be read back. A save is always recorded, as in VS Code: when the saved file cannot be
+   * read or is not a recordable notebook, doc.save carries the hash of the view held here.
+   */
+  saved(path: string, savedText: string | null): void {
+    const notebook = this.open.get(path);
+    if (notebook === undefined) return;
+    const saved = savedText === null ? null : viewOfSavedNotebook(savedText);
+    const sha256 = saved?.ok === true ? saved.sha256 : sha256Hex(textView(notebook.cells));
+    this.host.emit('doc.save', { path, sha256 });
   }
 
   closed(path: string): void {
