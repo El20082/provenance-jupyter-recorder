@@ -18,6 +18,7 @@ students use the recorder.
 | 7 | A shared package for the recorders' pure helpers | Refactor | Not urgent; `provjup` works without it |
 | 8 | Honeypot detection in the analyzer | New heuristic | v1 |
 | 9 | Each code cell's language in the log | Format change | Task 5.5; the viewer falls back to Python until then |
+| 10 | Possible Windows bug in the VS Code recorder's `extension_hash` | Question, possible bug fix | Not blocking `provjup`; affects VS Code students on Windows |
 
 `HostInfo.editor` gaining `'jupyterlab'` is already approved and is not repeated here.
 
@@ -277,6 +278,29 @@ Either way the viewer falls back to Python for logs recorded before this lands.
 
 **Needs:** the field or event in log-core with vectors, analyzer support in the viewer
 (request 5), and an `/architecture` update.
+
+## 10. Possible Windows bug in the VS Code recorder's `extension_hash`
+
+**Noticed while settling request 3; not confirmed.** `packages/recorder/src/commands/
+extension-hash.ts` hashes each file's relative path exactly as `path.relative` returns it. On
+Windows that path uses `\` (`activation\course-keys.js`), on macOS and Linux `/`. The path bytes
+go into the hash, so if the installed `dist/` has any subfolder, a Windows student's hash differs
+from one computed on macOS or Linux by `scripts/update-extension-hash-allowlist.mjs`. The
+`extension_hash_mismatch` heuristic would then flag every such Windows student as running a
+modified recorder.
+
+**It may not happen in practice.** The release build bundles into a single `dist/extension.js`.
+But `build:prod` does not clear `dist/` first, and `.vscodeignore` does not exclude its
+subfolders, so leftover `tsc` output (`dist/activation/`, `dist/commands/` and others, present in
+a local checkout) could be packaged.
+
+**Questions for the owner:**
+
+1. Does a published VSIX contain subfolders under `dist/`?
+2. If so, should the hash use `/` on every platform? That changes Windows hashes for future
+   releases only.
+3. Separately, `localeCompare` depends on the ICU version and locale. Is that acceptable for
+   VS Code, given that `provjup` pins byte order (request 3)?
 
 ## Related, not requested yet
 
