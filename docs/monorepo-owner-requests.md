@@ -106,7 +106,10 @@ would change their released hashes.
 **Decided by the project owner (2026-11-13):** each `provjup` release's hash reaches
 `known-good-extension-hashes.json` through `provjup`'s own release step. It computes the hash
 with the same tested code the recorder uses and opens a pull request to the monorepo adding
-it. `update-hashes` stays as it is. The sort order is still being decided.
+it. `update-hashes` stays as it is. **Sort order (decided):** byte order of each file's
+relative path, as UTF-8 with `/` separators on every platform, so the hash is the same on
+Windows, macOS and Linux. The vectors should include a path with capitals, `_`, `-` and a
+subfolder.
 
 **Approval needed:** adding the vectors, and accepting release-step pull requests to the
 allowlist.
