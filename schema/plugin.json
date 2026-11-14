@@ -1,7 +1,0 @@
-{
-  "title": "Provenance Recorder",
-  "description": "Provenance Recorder commands and settings.",
-  "type": "object",
-  "properties": {},
-  "additionalProperties": false
-}

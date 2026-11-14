@@ -86,6 +86,17 @@ describe('NotebookWiring', () => {
     expect(entries[1]!.data).toEqual({ path: 'hw.ipynb', sha256: sha256Hex(textView(cells)) });
   });
 
+  it('still records a save it cannot read back, with the hash of the view it holds', () => {
+    const { entries, wiring } = setup();
+    wiring.opened('hw.ipynb', cells);
+    wiring.saved('hw.ipynb', null);
+    wiring.saved('hw.ipynb', 'not a notebook');
+    expect(entries.map((e) => e.kind)).toEqual(['doc.open', 'doc.save', 'doc.save']);
+    const expected = { path: 'hw.ipynb', sha256: sha256Hex(textView(cells)) };
+    expect(entries[1]!.data).toEqual(expected);
+    expect(entries[2]!.data).toEqual(expected);
+  });
+
   it('ignores events for notebooks that are not open', () => {
     const { entries, wiring } = setup();
     wiring.sourceChanged('other.ipynb', 'a', [{ insert: 'x' }]);
@@ -142,5 +153,24 @@ describe('NotebookWiring output is a valid Provenance log', () => {
     expect(view).toBe(textView(current));
     const save = parsed.value.find((e) => e.kind === 'doc.save')!;
     expect((save.data as { sha256: string }).sha256).toBe(sha256Hex(view));
+  });
+});
+
+describe('NotebookWiring resynchronization', () => {
+  it('skips a change it already has, and replaces a cell whose change does not line up', () => {
+    const { entries, wiring } = setup();
+    wiring.opened('hw.ipynb', cells);
+    wiring.sourceChanged('hw.ipynb', 'a', [{ retain: 5 }, { insert: '0' }], 'x = 1');
+    expect(entries).toHaveLength(1);
+    wiring.sourceChanged('hw.ipynb', 'a', [{ insert: 'wrong' }], 'x = 10');
+    wiring.sourceChanged('hw.ipynb', 'b', null, '## Q3');
+    let view = (entries[0]!.data as { content: string }).content;
+    for (const e of entries.slice(1)) view = applyDeltas(view, (e.data as DocChangePayload).deltas);
+    expect(view).toBe(
+      textView([
+        { id: 'a', cell_type: 'code', source: 'x = 10' },
+        { id: 'b', cell_type: 'markdown', source: '## Q3' },
+      ]),
+    );
   });
 });

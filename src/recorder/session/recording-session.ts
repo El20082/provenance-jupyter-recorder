@@ -15,6 +15,8 @@ import type { Clock, Manifest, SessionKeypair } from '../../core/index';
 import { resolveVerifiedCapturePolicy } from '../activation/manifest-loader';
 import type { HostFacts, ProvjupServer } from '../io/server-client';
 import { SessionWriter, type Timers, type WriterProblem } from '../io/session-writer';
+import { FileWiring } from '../wiring/file-editor-wiring';
+import { NotebookWiring } from '../wiring/notebook-wiring';
 import { buildRecorderContext } from './recorder-context';
 import { createSessionHost, type SessionHost } from './session-host';
 
@@ -39,6 +41,10 @@ export interface RecordingSession {
   readonly sessionPubkeyHex: string;
   readonly host: SessionHost;
   readonly writer: SessionWriter;
+  /** Notebook edits for files in this assignment, recorded as the text view. */
+  readonly notebooks: NotebookWiring;
+  /** Plain text file edits for files in this assignment. */
+  readonly files: FileWiring;
   /** Emit session.end and write everything still buffered. Idempotent. */
   end(reason: string): Promise<void>;
 }
@@ -83,12 +89,20 @@ export async function startRecordingSession(deps: StartSessionDeps): Promise<Rec
   await writer.flush();
 
   let ended = false;
+  // Document events that arrive after the session ended (a late signal while the page
+  // closes) are dropped instead of reaching a disposed writer.
+  const emitWhileOpen: SessionHost['emit'] = (kind, data) => (ended ? null : host.emit(kind, data));
+  const notebooks = new NotebookWiring({ emit: emitWhileOpen });
+  const files = new FileWiring({ emit: emitWhileOpen });
+
   return {
     root: deps.root,
     sessionId,
     sessionPubkeyHex: keypair.publicKeyHex,
     host,
     writer,
+    notebooks,
+    files,
     async end(reason: string): Promise<void> {
       if (ended) return;
       ended = true;

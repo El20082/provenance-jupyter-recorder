@@ -21,7 +21,7 @@ Tasks 5 and 6.
 | Notebook text view and deltas | Implemented and tested; keystroke p99 0.34 ms on a 2 MB notebook |
 | Tests | 84 TypeScript and 32 Python passing; 77 to-do stubs |
 | Activation and session logs | Working in real JupyterLab (Task 4) |
-| Recording edits | Not started (Tasks 5 and 6) |
+| Recording edits | Typing in notebooks and text files recorded and replayed exactly in real JupyterLab (Task 5). Paste, focus, heartbeats and external changes are Task 6 |
 
 ## Progress
 
@@ -33,6 +33,7 @@ Tasks 5 and 6.
 | 2026-10-30 | Wrote the requests for the monorepo owner (not yet sent) |
 | 2026-11-13 | Fixed Lillian's integration and completed the real build (Task 3). Opened as PRs #2 to #5 |
 | 2026-11-13 | Completed Task 4: activation, session start and log writing, checked in real JupyterLab. PR #6 |
+| 2026-11-13 | Completed Task 5: notebook and text file edits, one event per keystroke, checked in real JupyterLab. Task 5 PR |
 
 ### Open pull requests
 
@@ -54,7 +55,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | 2 | Monorepo changes: `jupyterlab` editor value, notebook format, hash vectors, check 8, key-management wording | Waiting on the monorepo owner |
 | 3 | Real build | **Done**, in PRs #2 to #5; blockers B4 to B6 remain |
 | 4 | Activation, session lifecycle, log writing through the server | **Done**, in PR #6 |
-| 5 | Text files, then the notebook view | Text files ready; notebooks need B1 and B2 before students use them |
+| 5 | Text files, then the notebook view | **Done**, in the Task 5 PR; notebooks need B1 and B2 before students use them |
 | 6 | Paste, external changes (`watchdog`), focus, heartbeats | After Task 5 |
 | 7 | Checkpoints, recovery, rolling seal, auto-save on cell run | After Task 6 |
 | 8 | Terminal, git, peer witnessing, identity, enrollment | After Task 7 |
