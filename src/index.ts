@@ -17,6 +17,7 @@ import packageJson from '../package.json';
 import { SystemClock } from './core/index';
 import { activate } from './recorder/activation/activation';
 import { ServerClient } from './recorder/io/server-client';
+import { keystrokeTimer, timingRequested } from './recorder/perf/keystroke-timing';
 import { connectJupyterDocuments } from './recorder/wiring/jupyter-documents';
 
 export const PLUGIN_ID = 'provjup:plugin';
@@ -62,6 +63,8 @@ async function start(
     sessions: () => outcome.registry.all(),
     notebooks,
     editors,
+    // Only the browser check turns this on (scripts/browser-keystroke-check.mjs).
+    timeKeystroke: keystrokeTimer(timingRequested(globalThis), performance),
     readSavedText: async (path) => {
       try {
         const file = await app.serviceManager.contents.get(path, {

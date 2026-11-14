@@ -23,6 +23,7 @@ import {
   FakeWidget,
   flush,
 } from '../../support/fake-jupyter';
+import type { TimeKeystroke } from '../../../src/recorder/perf/keystroke-timing';
 import { signedManifest, testKey } from '../../support/manifests';
 import { applyDeltas } from '../../support/replay';
 
@@ -39,7 +40,7 @@ beforeAll(async () => {
   manifest = verified.value;
 });
 
-async function setup(roots = ['data100/hw1']) {
+async function setup(roots = ['data100/hw1'], timeKeystroke?: TimeKeystroke) {
   const server = new FakeServer();
   const sessions: RecordingSession[] = [];
   for (const [i, root] of roots.entries()) {
@@ -69,6 +70,7 @@ async function setup(roots = ['data100/hw1']) {
       const text = saved.get(path);
       return text instanceof Error ? Promise.reject(text) : Promise.resolve(text ?? null);
     },
+    ...(timeKeystroke !== undefined ? { timeKeystroke } : {}),
   });
 
   async function log(index = 0): Promise<readonly HashedEnvelope[]> {
@@ -308,5 +310,35 @@ describe('connectJupyterDocuments: text files', () => {
     await session.writer.flush();
     const text = server.text([...server.files.keys()][0]!);
     expect(text).toContain('"kind":"doc.open"');
+  });
+});
+
+describe('connectJupyterDocuments: keystroke timing hook', () => {
+  it('runs each keystroke handler through the hook once, and nothing else', async () => {
+    let timed = 0;
+    const env = await setup(['data100/hw1'], (handler) => {
+      timed++;
+      handler();
+    });
+    const cell = new FakeCell('a', 'code', '');
+    const nbContext = new FakeContext<SharedNotebookLike>(
+      'data100/hw1/hw1.ipynb',
+      new FakeNotebook([cell]),
+    );
+    env.notebooks.add(new FakeWidget(nbContext));
+    await nbContext.load();
+    const file = new FakeFile('');
+    const fileContext = new FakeContext<SharedFileLike>('data100/hw1/util.py', file);
+    env.editors.add(new FakeWidget(fileContext));
+    await fileContext.load();
+
+    for (const ch of 'abc') cell.edit([{ retain: cell.getSource().length }, { insert: ch }]);
+    for (const ch of 'de') file.edit([{ retain: file.getSource().length }, { insert: ch }]);
+    nbContext.saveState.emit('completed');
+    await flush();
+
+    expect(timed).toBe(5);
+    const entries = await env.log();
+    expect(entries.filter((e) => e.kind === 'doc.change')).toHaveLength(5);
   });
 });
