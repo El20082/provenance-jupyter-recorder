@@ -289,7 +289,7 @@ language belongs to the notebook (`metadata.language_info.name`, falling back to
 `metadata.kernelspec.language`) and changes when the student switches kernels; a cell magic
 on a cell's first line (`%%R`, `%%bash`, `%%sql`) overrides it for that cell. Markdown and raw
 cells have none. **Requirement:** at every point in the log, each code cell's language can be
-recovered. **Blocked by** the monorepo owner (request 9): it is a format change. Do not merge
+recovered. **Shape A (decided):** the notebook's language in its `doc.open` payload, plus an event whenever it changes (a kernel switch); the analyzer applies cell magics (`%%R`, `%%bash`) from the cell source. **Blocked by** the monorepo owner (request 9): it is a format change. Do not merge
 recorder code that emits it before log-core has it. Files:
 `src/recorder/wiring/notebook-wiring.ts`, `src/recorder/events/`.
 

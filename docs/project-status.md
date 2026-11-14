@@ -50,7 +50,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 
 | Task | Work | Status |
 | --- | --- | --- |
-| 1 | Record decisions | In progress: decisions 6, 7, 1 and 10 remain |
+| 1 | Record decisions | Done for the project owner; 9 and 18 wait on the project lead |
 | 2 | Monorepo changes: `jupyterlab` editor value, notebook format, hash vectors, check 8, key-management wording | Waiting on the monorepo owner |
 | 3 | Real build | **Done**, in PRs #2 to #5; blockers B4 to B6 remain |
 | 4 | Activation, session lifecycle, log writing through the server | **Done**, in PR #6 |
@@ -95,7 +95,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | 12 | Data 100 is the first pilot |
 | 13 | Vitest, ESLint and Prettier |
 | 14 | `watchdog` for file watching, with a slow polling safety net |
-| 19 | The log records each code cell's language (task 5.5, #55); waits on monorepo request 9 |
+| 19 | The log records each code cell's language: the notebook's language on open plus an event when it changes, with cell magics read from the source (task 5.5, #55); waits on monorepo request 9 |
 | 17 | The server reports disk changes through Jupyter Server's event stream, not polling |
 | 16 | Approved dependencies: `watchdog`, `@jupyterlab/statusbar`, `@jupyterlab/apputils` (#54) |
 | 7 | The VS Code recorder's pure helpers are imported from the submodule like log-core, never copied |

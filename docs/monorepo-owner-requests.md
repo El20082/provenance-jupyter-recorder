@@ -233,7 +233,8 @@ including after a kernel change.
 | A. Notebook language plus changes | `language` in the notebook's `doc.open` payload, and an event when it changes. The analyzer applies cell magics from the source | Small. One field per notebook; magics are derived, not stored |
 | B. In the text view | Each header line carries it: `# %% [code] id=a1b2c3 lang=python` | Every cell explicit, but a kernel change rewrites every header, and request 1 changes |
 
-We lean to A. Either way the viewer falls back to Python for logs recorded before this lands.
+**Decided by the project owner (2026-11-13): A.** The exact field and event names are yours.
+Either way the viewer falls back to Python for logs recorded before this lands.
 
 **Needs:** the field or event in log-core with vectors, analyzer support in the viewer
 (request 5), and an `/architecture` update.
