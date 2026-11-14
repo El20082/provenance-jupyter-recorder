@@ -122,6 +122,7 @@ Outreach that is not code is at the end.
 | 2.12 | `cell.execute` event with an output digest, and run markers in the viewer | `packages/log-core`, `analyzer` | M | 2.2 | Request 6 | #56 |
 | 2.13 | Each code cell's language (shape A), and per-cell highlighting | `packages/log-core`, `analyzer` | S | 2.2 | Request 9 | #57 |
 | 2.14 | A shared package for the recorders' pure helpers | `packages/recorder` | M | — | Request 7; not urgent | #58 |
+| 2.15 | Check `extension_hash` path separators on Windows (possible bug, not confirmed) | `packages/recorder/src/commands/extension-hash.ts` | S | — | Request 10 | #59 |
 
 **Details:**
 
