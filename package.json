@@ -19,6 +19,7 @@
     "prepare": "npm run build:core",
     "typecheck": "npm run build:core && tsc -p tsconfig.json",
     "test": "npm run build:core && node scripts/vitest.mjs run",
+    "bench": "npm run build:core && node scripts/vitest.mjs run --reporter=verbose --config vitest.bench.config.ts",
     "lint": "eslint src tests && prettier --check src tests",
     "format": "prettier --write src tests"
   },
