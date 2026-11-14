@@ -306,6 +306,12 @@ In JupyterLab, the browser console reports which assignment folders are being re
 After changing the frontend, run `npm run build` and reload the page. Python checks:
 `pytest`, `ruff check provjup tests/server` and `mypy`.
 
+Before a release, check the keystroke budget in a real JupyterLab: `npm run build`, then
+`node scripts/browser-keystroke-check.mjs --large` with `JUPYTER` set to the environment's
+`jupyter`. It types real keystrokes in headless Chrome, fails if any handler's p99 is over
+1 ms, and checks the log holds one `doc.change` per keystroke. Chrome reports times in 0.1 ms
+steps on JupyterLab's pages, which is fine for a 1 ms budget.
+
 Each npm command also has a `make` target (`make test`, `make lint` and so on).
 `make vectors` regenerates the conformance fixtures from a monorepo checkout set in
 `PROVENANCE_REPO`.
