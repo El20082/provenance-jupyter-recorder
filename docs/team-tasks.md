@@ -64,6 +64,7 @@ Sizes: **S** is under a day, **M** is a few days, **L** is a week or more.
 | 5.2 | Connect notebook edits to the recorder | M | 5.1 | — | — (done in the Task 5 PR) |
 | 5.3 | Record plain text files | M | 5.1 | — | — (done in the Task 5 PR) |
 | 5.4 | Refuse to record while real-time collaboration is on (decision 6) | S | 5.2 | — | #51 |
+| 5.5 | Record each code cell's language (decision 19) | S | 5.2 | Monorepo approval (request 9) | #55 |
 | 6.1 | Heartbeats that survive hidden tabs | M | — | **Several tabs (project lead)** | #22 |
 | 6.2 | Focus and selection events | S | 5.2, 5.3 | — | #23 |
 | 6.0 | Import VS Code recorder helpers from the submodule (decision 7) | S | — | — | #52 |
@@ -282,6 +283,16 @@ editor, recorded exactly as VS Code records them.
   (stubs).
 - VS Code: `wiring/doc-wiring.ts`, `events/doc-events.ts`.
 - Done when: open, edit, save and close of a `.py` file produce the same events as VS Code would.
+
+**5.5 Record each code cell's language (decided 2026-11-13, decision 19).** The analyzer's
+viewer needs it to highlight beyond Python: R, Julia, SQL and others. In JupyterLab the
+language belongs to the notebook (`metadata.language_info.name`, falling back to
+`metadata.kernelspec.language`) and changes when the student switches kernels; a cell magic
+on a cell's first line (`%%R`, `%%bash`, `%%sql`) overrides it for that cell. Markdown and raw
+cells have none. **Requirement:** at every point in the log, each code cell's language can be
+recovered. **Blocked by** the monorepo owner (request 9): it is a format change. Do not merge
+recorder code that emits it before log-core has it. Files:
+`src/recorder/wiring/notebook-wiring.ts`, `src/recorder/events/`.
 
 ### Task 6: Signals
 

@@ -17,6 +17,7 @@ students use the recorder.
 | 6 | `cell.execute` event for cell runs, with an output digest | Format change | Task 10 |
 | 7 | A shared package for the recorders' pure helpers | Refactor | Not urgent; `provjup` works without it |
 | 8 | Honeypot detection in the analyzer | New heuristic and policy question | v1 |
+| 9 | Each code cell's language in the log | Format change | Task 5.5; the viewer falls back to Python until then |
 
 `HostInfo.editor` gaining `'jupyterlab'` is already approved and is not repeated here.
 
@@ -205,6 +206,37 @@ reach the recorder, the manifest or the bundle.
 2. What is a honeypot: a planted wrong answer, a fake source, or a trap instruction?
 3. Does comparing student text fit recorder PRD NG5, which rules out judging the code itself?
    Provenance reasons about how work was produced, not about the code.
+
+## 9. Each code cell's language in the log
+
+**Decided by the project owner (2026-11-13, decision 19):** the log records the language of
+each code cell. The analyzer's notebook viewer (request 5) needs it to highlight code, and
+Provenance should work beyond Python courses: R, Julia, SQL and others. The `ipynb-source-v1`
+view (request 1) keeps cell types, ids and sources, but drops the notebook metadata that holds
+the language.
+
+**Where the language comes from in JupyterLab:**
+
+- The notebook's language: `metadata.language_info.name`, falling back to
+  `metadata.kernelspec.language`. It changes when the student switches kernels.
+- Per-cell overrides: a cell magic on a cell's first line (`%%R`, `%%bash`, `%%sql`). The first
+  line is already in the log as part of the source.
+- Markdown and raw cells have no language.
+
+**Requirement:** at every point in the log, each code cell's language can be recovered,
+including after a kernel change.
+
+**Possible shapes, for the owner to choose:**
+
+| Shape | How | Trade-off |
+| --- | --- | --- |
+| A. Notebook language plus changes | `language` in the notebook's `doc.open` payload, and an event when it changes. The analyzer applies cell magics from the source | Small. One field per notebook; magics are derived, not stored |
+| B. In the text view | Each header line carries it: `# %% [code] id=a1b2c3 lang=python` | Every cell explicit, but a kernel change rewrites every header, and request 1 changes |
+
+We lean to A. Either way the viewer falls back to Python for logs recorded before this lands.
+
+**Needs:** the field or event in log-core with vectors, analyzer support in the viewer
+(request 5), and an `/architecture` update.
 
 ## Related, not requested yet
 

@@ -95,6 +95,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | 12 | Data 100 is the first pilot |
 | 13 | Vitest, ESLint and Prettier |
 | 14 | `watchdog` for file watching, with a slow polling safety net |
+| 19 | The log records each code cell's language (task 5.5, #55); waits on monorepo request 9 |
 | 17 | The server reports disk changes through Jupyter Server's event stream, not polling |
 | 16 | Approved dependencies: `watchdog`, `@jupyterlab/statusbar`, `@jupyterlab/apputils` (#54) |
 | 7 | The VS Code recorder's pure helpers are imported from the submodule like log-core, never copied |
