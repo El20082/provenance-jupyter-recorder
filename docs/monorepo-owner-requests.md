@@ -130,8 +130,8 @@ its own chunk). Notebooks then look in the analyzer as they did to the student.
   ported from Monaco onto each cell's CodeMirror editor.
 
 No format change is needed beyond request 1. Output content is not recorded, so the viewer shows
-code and Markdown, plus run markers from `cell.execute` (request 6). It defaults to Python
-highlighting because the view records no kernel language.
+code and Markdown, plus run markers from `cell.execute` (request 6). Code cells are highlighted in
+each cell's recorded language (request 9), falling back to Python for older logs.
 
 **Approval needed:** the new analyzer dependencies and their bundle size.
 
