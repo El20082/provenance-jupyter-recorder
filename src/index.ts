@@ -1,8 +1,8 @@
 /**
  * JupyterLab plugin entry.
  *
- * The plugin id `provjup:plugin` makes JupyterLab read its settings schema from
- * `schema/plugin.json`. On start it activates recording for every verified assignment folder
+ * The plugin has no settings, so it has no settings schema: students get no knobs to change.
+ * On start it activates recording for every verified assignment folder
  * under the server root, records edits to notebooks and text files in those folders, and ends
  * the sessions when the page closes.
  *
