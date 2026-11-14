@@ -103,8 +103,13 @@ The recorders also sort differently:
 the same on any machine. Leave the other recorders unchanged, because changing their sort
 would change their released hashes.
 
-**Approval needed:** adding the vectors, and how a `provjup` release hash reaches
-`known-good-extension-hashes.json`, given that `update-hashes` uses `localeCompare`.
+**Decided by the project owner (2026-11-13):** each `provjup` release's hash reaches
+`known-good-extension-hashes.json` through `provjup`'s own release step. It computes the hash
+with the same tested code the recorder uses and opens a pull request to the monorepo adding
+it. `update-hashes` stays as it is. The sort order is still being decided.
+
+**Approval needed:** adding the vectors, and accepting release-step pull requests to the
+allowlist.
 
 ## 4. Secret rule wording
 
@@ -128,6 +133,11 @@ with Google as they do in VS Code.
 - Anything running as the student can read the file, including code in a notebook.
 - Teachers and TAs have `access:servers` on the target courses, and admins can reach home
   directories, so they could read the file and sign as that student.
+
+**Decided by the project owner (2026-11-13): propose the home-directory file,** with the
+weaknesses above stated openly in the docs. It adds no student step. A leaked secret allows
+logs forged in that student's name, but not access to their Google account or other data.
+Signing in with Google every session was rejected because it adds a student step each time.
 
 **Approval needed:** updated §4.4 and §9 wording, and acceptance of these weaknesses.
 

@@ -115,9 +115,9 @@ Outreach that is not code is at the end.
 | 2.5 | Export vectors for the text view and `extension_hash`; decide how a `provjup` release hash reaches the allowlist | `tools/export-conformance-vectors.ts`, `scripts/update-extension-hash-allowlist.mjs` | M | 2.2 | Request 3 | #15 |
 | 2.6 | Treat `nbgitpuller` updates like git when explaining external changes | `packages/analysis-core/src/index/classify-external-changes.ts` | M | — | Owner agreement | #16 |
 | 2.7 | **JupyterLab-based notebook viewer in replay** (decided 2026-11-13) | `packages/analyzer/src/views/replay/` | L | 2.2 | Owner agreement (new UI dependencies) | #17 |
-| 2.8 | Add each `provjup` release's hash to the allowlist | `packages/analysis-core/src/heuristics/config/known-good-extension-hashes.json` | S | 2.5, a release | — | #18 |
+| 2.8 | Add each `provjup` release's hash to the allowlist, through a pull request from `provjup`'s release step (decided) | `packages/analysis-core/src/heuristics/config/known-good-extension-hashes.json` | S | 2.5, a release | — | #18 |
 | 2.9 | `/architecture`: add the JupyterLab recorder to the ecosystem and roadmap diagrams | `tools/architecture/dot/`, `packages/analyzer/src/views/architecture/content/nodes/` | M | — | Owner agreement | #19 |
-| 2.10 | Allow the home-directory secret rule for browser-hosted recorders | `docs/key-management.md` §4.4 and §9 | S | — | Request 4 | #20 |
+| 2.10 | Allow the home-directory secret rule for browser-hosted recorders, with its weaknesses stated (proposal decided) | `docs/key-management.md` §4.4 and §9 | S | — | Request 4 approval | #20 |
 | 2.11 | **`honeypot_similarity` heuristic and staff-only honeypot storage (v1)** | `analysis-core`, `analyzer` or `server` | L | — | Owner agreement (request 8) | #21 |
 | 2.12 | `cell.execute` event with an output digest, and run markers in the viewer | `packages/log-core`, `analyzer` | M | 2.2 | Request 6 | #56 |
 | 2.13 | Each code cell's language (shape A), and per-cell highlighting | `packages/log-core`, `analyzer` | S | 2.2 | Request 9 | #57 |
