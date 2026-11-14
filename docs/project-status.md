@@ -9,9 +9,10 @@ Updated 2026-11-13. This page summarizes where the JupyterLab recorder stands. D
 ## Where things stand
 
 In JupyterLab 4.5.0, the version Data 100 runs, the extension finds verified assignment
-folders, starts a session for each, and writes a hash-chained log with `session.start` and
-`session.end`. **Edits are not recorded yet:** the notebook and editor signals are wired in
-Tasks 5 and 6.
+folders, starts a session for each, and writes a hash-chained log. Typing in notebooks and
+text files is recorded one event per keystroke and replays exactly (Task 5, in its PR, not
+merged yet). Paste, focus, heartbeats and external changes come next (Task 6). Rechecked
+in real JupyterLab on 2026-11-13 from the top of the code stack (#54).
 
 | Area | State |
 | --- | --- |
@@ -19,9 +20,9 @@ Tasks 5 and 6.
 | `log-core` | Git submodule at monorepo commit `fe3a290`, built locally |
 | Session host | Ported from VS Code; every entry hash-chained |
 | Notebook text view and deltas | Implemented and tested; keystroke p99 0.34 ms on a 2 MB notebook |
-| Tests | 84 TypeScript and 32 Python passing; 77 to-do stubs |
+| Tests | 114 TypeScript and 32 Python passing; 74 to-do stubs; conformance vectors match a fresh export |
 | Activation and session logs | Working in real JupyterLab (Task 4) |
-| Recording edits | Not started (Tasks 5 and 6) |
+| Recording edits | Typing in notebooks and text files recorded and replayed exactly in real JupyterLab (Task 5). Paste, focus, heartbeats and external changes are Task 6 |
 
 ## Progress
 
@@ -33,18 +34,24 @@ Tasks 5 and 6.
 | 2026-10-30 | Wrote the requests for the monorepo owner (not yet sent) |
 | 2026-11-13 | Fixed Lillian's integration and completed the real build (Task 3). Opened as PRs #2 to #5 |
 | 2026-11-13 | Completed Task 4: activation, session start and log writing, checked in real JupyterLab. PR #6 |
+| 2026-11-13 | Completed Task 5: notebook and text file edits, one event per keystroke, checked in real JupyterLab. Task 5 PR |
+| 2026-11-13 | Reviewed every open decision with the project owner; recorded in PR #50. Tested `\r` line endings in real JupyterLab |
 
 ### Open pull requests
 
-Merge in order. Each targets the one before it; avoid squash or rebase merges.
+**The code stack:** merge in order. Each targets the one before it; avoid squash or rebase
+merges. #2 is merged, and #3 and #4 were merged into the stack.
 
 | PR | Contents |
 | --- | --- |
-| [#2](https://github.com/El20082/provenance-jupyter-recorder/pull/2) | Shared ignore rules and the analyzer gate script |
-| [#3](https://github.com/El20082/provenance-jupyter-recorder/pull/3) | Vitest, ESLint, Prettier and the `log-core` build |
-| [#4](https://github.com/El20082/provenance-jupyter-recorder/pull/4) | Fixes to the `log-core` integration |
-| [#5](https://github.com/El20082/provenance-jupyter-recorder/pull/5) | The real JupyterLab build |
-| [#6](https://github.com/El20082/provenance-jupyter-recorder/pull/6) | Task 4: activation, session start and log writing |
+| [#5](https://github.com/ProvenanceTools/provenance-jupyter-recorder/pull/5) | The real JupyterLab build (includes #3 and #4) |
+| [#6](https://github.com/ProvenanceTools/provenance-jupyter-recorder/pull/6) | Task 4: activation, session start and log writing |
+| [#48](https://github.com/ProvenanceTools/provenance-jupyter-recorder/pull/48) | Task 5: notebook and text file edits |
+| [#53](https://github.com/ProvenanceTools/provenance-jupyter-recorder/pull/53) | Removes the unused `style/`, settings schema and `ui-tests/` |
+| [#54](https://github.com/ProvenanceTools/provenance-jupyter-recorder/pull/54) | Adds the approved `watchdog`, `statusbar` and `apputils` dependencies |
+
+**Separate:** [#50](https://github.com/ProvenanceTools/provenance-jupyter-recorder/pull/50), the decisions from the 2026-11-13 review, targets
+`scaffold/initial` on its own. A squash merge is fine for it.
 
 ## Tasks
 
@@ -52,9 +59,9 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | --- | --- | --- |
 | 1 | Record decisions | Done, except 18 (several tabs), which waits on the project lead |
 | 2 | Monorepo changes: `jupyterlab` editor value, notebook format, hash vectors, check 8, key-management wording | Waiting on the monorepo owner |
-| 3 | Real build | **Done**, in PRs #2 to #5; blockers B4 to B6 remain |
+| 3 | Real build | **Done**, in PRs #2 to #5; blockers B4 to B6 resolved |
 | 4 | Activation, session lifecycle, log writing through the server | **Done**, in PR #6 |
-| 5 | Text files, then the notebook view | Text files ready; notebooks need B1 and B2 before students use them |
+| 5 | Text files, then the notebook view | **Done**, in the Task 5 PR; notebooks need B1 and B2 before students use them |
 | 6 | Paste, external changes (`watchdog`), focus, heartbeats | After Task 5 |
 | 7 | Checkpoints, recovery, rolling seal, auto-save on cell run | After Task 6 |
 | 8 | Terminal, git, peer witnessing, identity, enrollment | After Task 7 |

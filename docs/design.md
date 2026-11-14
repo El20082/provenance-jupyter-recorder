@@ -90,14 +90,19 @@ published npm dependencies, with no fork (option A, confirmed). Falling back to 
 editor per cell (option B) needs the project owner's approval. Consequences for the recorder:
 
 - The view must be parsable back into cells. log-core gains a parser alongside the projection,
-  shared by both sides, and the look-alike header edge case must be settled so that a cell
-  containing a line like `# %% [code] id=…` is never split in two.
+  shared by both sides. A cell containing a line like `# %% [code] id=…` is not escaped
+  (decided): hashes are unaffected, and in that rare case the viewer may show the cell as two.
 - Cell ids must stay unique and stable for the life of a notebook; the recorder already refuses
   notebooks without them.
 - Output content is not recorded, so the viewer shows code and Markdown. Cell runs appear as
   markers from `cell.execute`, showing success or failure and whether the outputs changed.
-- The view records no kernel language. The target courses use Python, so the viewer defaults to
-  Python highlighting; recording the language would be a format change.
+- The log records each code cell's language (decision 19, shape A): the notebook's language in
+  `doc.open`, plus an event when it changes, with cell magics read from the source. This is a
+  format change (monorepo request 9); until it lands, and for older logs, the viewer
+  highlights as Python.
+- A `\r` inside a cell is kept as an ordinary character, never converted (request 2). JupyterLab
+  misplaces edits in such cells (jupyterlab/jupyterlab#14715), so staff distribute notebooks with
+  `\n` line endings only, and the viewer notes cells that opened with `\r`.
 
 ## 9. Build sequence
 

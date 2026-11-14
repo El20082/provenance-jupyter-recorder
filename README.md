@@ -323,3 +323,7 @@ dependencies are approved and the real build exists.
    aimed at AI tools that asks for a marker, such as a variable named `honey_pot`. The
    analyzer flags the marker in text the student added, comparing with all whitespace
    removed, to be revisited with professors. It is a flag, never a finding.
+
+Decisions 10 to 19 are recorded in `docs/plans/2026-10-30-plan.md`. The only one still open is
+**18, the same assignment in several browser tabs**, which needs the project lead; see
+"Several tabs" in `docs/team-tasks.md`.

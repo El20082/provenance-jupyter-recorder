@@ -25,13 +25,13 @@ things stand see [`project-status.md`](project-status.md).
 **Read first:** [`CLAUDE.md`](../CLAUDE.md) (the repo's rules), [`design.md`](design.md), and the
 "Development" section of the [README](../README.md) for setup.
 
-**Where to branch from.** The working code is in pull requests #2 to #6, which are not merged
-yet. Until they are, branch from `feat/task-4-activation`, the top of that stack. Once they are
-merged, branch from `scaffold/initial`.
+**Where to branch from.** The working code is in the stack of pull requests #5, #6, #48, #53
+and #54, which are not merged yet. Until they are, branch from `chore/add-approved-dependencies`
+(#54), the top of that stack. Once they are merged, branch from `scaffold/initial`.
 
 **Rules every task follows** (from `CLAUDE.md`; these are the ones most often missed):
 
-- **Copy the VS Code recorder first.** Each task names the matching module in the monorepo's
+- **Start from the VS Code recorder.** Each task names the matching module in the monorepo's
   `packages/recorder/src/` (also at `vendor/provenance/packages/recorder/src/`). Read it and its
   tests, keep its behavior and names, and write down any difference JupyterLab forces.
 - **Import VS Code's pure helpers, never copy them.** Modules that do not import `vscode`
