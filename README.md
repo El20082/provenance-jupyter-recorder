@@ -290,7 +290,7 @@ items need explicit approval.
 Requires Node 22 or later, and Python 3.11 or later with `pip`.
 
 ```sh
-git clone --recurse-submodules https://github.com/El20082/provenance-jupyter-recorder
+git clone --recurse-submodules https://github.com/ProvenanceTools/provenance-jupyter-recorder
 cd provenance-jupyter-recorder
 npm install              # also builds vendor/provenance/packages/log-core
 npm test                 # Vitest: unit, conformance and gate tests
