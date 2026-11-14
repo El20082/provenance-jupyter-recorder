@@ -127,8 +127,7 @@ Outreach that is not code is at the end.
   (`src/recorder/session/recorder-context.ts`).
 - **2.2** pins the projection in `log-core` with vectors, replacing this repo's draft in
   `src/notebook/text-view.ts`. Settle the edge cases in request 2 first: notebooks before
-  nbformat 4.5, lines that look like cell boundaries, and `
-`.
+  nbformat 4.5, lines that look like cell boundaries, and `\r\n`.
 - **2.4 is the critical one.** Students submit the `.ipynb` with outputs, whose bytes never
   match the recording. Check 8 must compare the view hash for `view`-tagged paths instead. Old
   analyzers without this change would flag every notebook submission, so it ships first.
