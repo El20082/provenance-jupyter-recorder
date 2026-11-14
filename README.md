@@ -296,6 +296,7 @@ npm install              # also builds vendor/provenance/packages/log-core
 npm test                 # Vitest: unit, conformance and gate tests
 npm run typecheck
 npm run lint             # ESLint and Prettier
+npm run bench            # keystroke path p99 against the 1 ms budget (reports, never fails)
 pip install -e .         # builds the labextension and installs both extensions
 pip install --group dev  # pytest, ruff, mypy
 jupyter labextension develop . --overwrite   # serve rebuilt frontends without reinstalling
