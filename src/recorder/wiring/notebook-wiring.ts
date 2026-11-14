@@ -11,7 +11,8 @@
  * Not here, by design:
  * - paste, selection, focus and heartbeat events: their own modules, in Task 6;
  * - session.start / session.end: the session lifecycle, in Task 4;
- * - cell execution and kernel events: not part of the format (decisions 1 and 10).
+ * - cell runs: a `cell.execute` event with an output digest (decisions 1 and 10, Task 10),
+ *   once log-core has it (monorepo request 6). Other kernel events are not recorded.
  */
 
 import type { DocChangeDelta } from '../../core/index';
