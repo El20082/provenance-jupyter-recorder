@@ -61,7 +61,8 @@ Notebooks use the `ipynb-source-v1` text view defined in the README.
 | Secrets | `0600` file in `stdpath("data")` | PasswordSafe | `0600` file in the Jupyter data directory (§12) |
 | Peer witnessing | `uv` watcher on `.provenance/` | VFS listener | Server watcher on `.provenance/` |
 
-Jupyter-specific risks: edits from real-time collaborators, the same notebook in two
+Jupyter-specific risks: edits from real-time collaborators (decided: collaboration must be off for v1, and the
+recorder refuses to record while it is on; group work is a separate project later), the same notebook in two
 tabs, hub idle shutdown, and `%load` or `!cmd` changing files.
 
 ## 6. Producer identity
@@ -84,17 +85,24 @@ recorder needs format additions, which require approval and must ship analyzer-f
 **Analyzer notebook viewer (decided 2026-11-13).** The analyzer shows replayed notebooks with
 JupyterLab's own open-source notebook components (BSD-3-Clause), embedded in its replay view the
 way Monaco is embedded today (`packages/analyzer/src/views/replay/MonacoMount.tsx`, lazy-loaded).
-Notebooks then look in the analyzer as they did to the student. Consequences for the recorder:
+Notebooks then look in the analyzer as they did to the student. The packages are used as
+published npm dependencies, with no fork (option A, confirmed). Falling back to one Monaco
+editor per cell (option B) needs the project owner's approval. Consequences for the recorder:
 
 - The view must be parsable back into cells. log-core gains a parser alongside the projection,
-  shared by both sides, and the look-alike header edge case must be settled so that a cell
-  containing a line like `# %% [code] id=…` is never split in two.
+  shared by both sides. A cell containing a line like `# %% [code] id=…` is not escaped
+  (decided): hashes are unaffected, and in that rare case the viewer may show the cell as two.
 - Cell ids must stay unique and stable for the life of a notebook; the recorder already refuses
   notebooks without them.
 - Output content is not recorded, so the viewer shows code and Markdown. Cell runs appear as
   markers from `cell.execute`, showing success or failure and whether the outputs changed.
-- The view records no kernel language. The target courses use Python, so the viewer defaults to
-  Python highlighting; recording the language would be a format change.
+- The log records each code cell's language (decision 19, shape A): the notebook's language in
+  `doc.open`, plus an event when it changes, with cell magics read from the source. This is a
+  format change (monorepo request 9); until it lands, and for older logs, the viewer
+  highlights as Python.
+- A `\r` inside a cell is kept as an ordinary character, never converted (request 2). JupyterLab
+  misplaces edits in such cells (jupyterlab/jupyterlab#14715), so staff distribute notebooks with
+  `\n` line endings only, and the viewer notes cells that opened with `\r`.
 
 ## 9. Build sequence
 

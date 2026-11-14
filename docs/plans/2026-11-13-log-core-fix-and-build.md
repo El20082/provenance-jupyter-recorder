@@ -17,10 +17,8 @@ Blockers are numbered once and never renumbered. Each says who must act.
 | # | Blocker | Who | Effect until resolved |
 | --- | --- | --- | --- |
 | B1 | Approve the `view` field and the `ipynb-source-v1` projection (`docs/monorepo-owner-requests.md` item 1) | Monorepo owner | `doc.open` for a notebook carries no `view` marker, so the analyzer treats the view as a plain file, and check 8 would report a mismatch against the submitted `.ipynb`. The projection lives in `src/notebook/text-view.ts` until it moves to log-core. Fine for development; must be resolved before students use it. |
-| B2 | Decide the text-view edge cases (item 2): notebooks before nbformat 4.5, and `
-` in cell sources | Monorepo owner, then you | Notebooks without cell ids are **not recorded at all**, by returning `missing_cell_id`. `
-` passes through unchanged. |
-| B3 | Decision 7: copy shared VS Code helpers or move them into a package | You | `MAX_INLINE_BYTES` (64 KB) is copied into `notebook-wiring.ts`, and the replay helper in `tests/support/replay.ts` copies analysis-core's. Each copy can drift. |
+| B2 | Decide the text-view edge cases (item 2): notebooks before nbformat 4.5, and `\r\n` in cell sources | Monorepo owner, then you | Notebooks without cell ids are **not recorded at all**, by returning `missing_cell_id`. `\r\n` passes through unchanged. |
+| B3 | Decision 7: copy shared VS Code helpers or move them into a package. **Resolved 2026-11-13:** imported from the submodule like log-core | You | `MAX_INLINE_BYTES` (64 KB) is copied into `notebook-wiring.ts`, and the replay helper in `tests/support/replay.ts` copies analysis-core's. Each copy can drift. |
 | B4 | Confirm the build dependencies added in step 3, which a real build cannot avoid: `@jupyterlab/application` (runtime, supplied by JupyterLab itself), `@jupyterlab/builder` (build only), `jupyter_server` (runtime, already on DataHub), and `hatchling`, `hatch-jupyter-builder` and `jupyterlab` (Python build only) | You | Already added, because you asked for the real build. Remove any you reject. |
 | B5 | Wire `style/index.css` through `"style"` in `package.json`, or delete `style/` | You | `style/` stays unwired, which is harmless. Nothing needs CSS until the status item in Task 4. |
 | B6 | Approve Python dev tools: `pytest`, `ruff`, `mypy` | You | They are configured in `pyproject.toml` but not installed, so the Python side is not linted or tested yet. Needed once `provjup/` gains real code in Task 4. |
@@ -123,7 +121,7 @@ UTF-16 offsets. That is checked when the wiring connects to real JupyterLab sign
 
 ### Step 3: The real build (Task 3)
 
-**Dependencies added (blocker B4):**
+**Dependencies added (blocker B4; all confirmed by the project owner on 2026-11-13):**
 
 | Package | Range | Kind | Why |
 | --- | --- | --- | --- |
