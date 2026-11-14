@@ -290,6 +290,9 @@ items need explicit approval.
 11. `docs/key-management.md`: allow the home-directory secret rule for hub-hosted recorders.
 12. `log-core`: a `cell.execute` event for cell runs, with an output digest *(decided here;
     needs approval)*. The analyzer shows run markers and output changes in the notebook viewer.
+13. `log-core`: the notebook's language in `doc.open`, plus an event when it changes
+    *(decided here, shape A; needs approval)*. The viewer highlights each code cell in its
+    language.
 
 ---
 
