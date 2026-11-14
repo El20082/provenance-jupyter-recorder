@@ -319,10 +319,7 @@ dependencies are approved and the real build exists.
 7. **Shared helpers (decided):** import the VS Code recorder's pure modules from the submodule,
    like log-core. Monorepo request 7 asks for a proper shared package later.
 8. **`log-core` delivery (decided):** a git submodule of the monorepo at `vendor/provenance`.
-9. **Honeypot matching (in v1, analyzer side; three questions open):**
-   - What counts as "similar": exact, whitespace-normalized, or fuzzy token match,
-     and at what threshold?
-   - What is a honeypot here: a planted wrong answer, a fake source or a trap
-     instruction?
-   - Does comparing student text fit recorder PRD NG5 and the rule against analyzing
-     student code?
+9. **Honeypot matching (decided, v1, analyzer side):** a honeypot is a hidden instruction
+   aimed at AI tools that asks for a marker, such as a variable named `honey_pot`. The
+   analyzer flags the marker in text the student added, comparing with all whitespace
+   removed, to be revisited with professors. It is a flag, never a finding.

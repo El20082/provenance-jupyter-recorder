@@ -50,7 +50,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 
 | Task | Work | Status |
 | --- | --- | --- |
-| 1 | Record decisions | Done for the project owner; 9 and 18 wait on the project lead |
+| 1 | Record decisions | Done, except 18 (several tabs), which waits on the project lead |
 | 2 | Monorepo changes: `jupyterlab` editor value, notebook format, hash vectors, check 8, key-management wording | Waiting on the monorepo owner |
 | 3 | Real build | **Done**, in PRs #2 to #5; blockers B4 to B6 remain |
 | 4 | Activation, session lifecycle, log writing through the server | **Done**, in PR #6 |
@@ -74,7 +74,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | # | Blocker | Who | Effect until resolved |
 | --- | --- | --- | --- |
 | B1 | Approve the `view` field and the `ipynb-source-v1` format | Monorepo owner | The analyzer treats a notebook as a plain file; not usable by students |
-| B2 | Settle text-view edge cases: notebooks before format 4.5, `\r\n` in cells, cell-boundary lookalike lines | Monorepo owner, then you | Notebooks without cell ids are not recorded at all |
+| B2 | Settle text-view edge cases. **Decided:** nbformat 4.5 or later is a hard limit. Still open: `\r\n` in cells, cell-boundary lookalike lines | Monorepo owner, then you | Notebooks without cell ids are not recorded at all |
 | B3 | Decision 7: shared VS Code helpers | You | **Resolved 2026-11-13 (option D):** imported from the submodule like log-core (#52) |
 | B4 | Confirm the JupyterLab packages added for the build | You | **Resolved 2026-11-13:** all confirmed (`application`, `builder`, `services`, `coreutils`, `notebook`, `fileeditor`, and the Python build tools) |
 | B5 | `style/` | You | **Resolved 2026-11-13:** `style/`, the unused settings schema and `ui-tests/` removed (#53) |
@@ -95,6 +95,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | 12 | Data 100 is the first pilot |
 | 13 | Vitest, ESLint and Prettier |
 | 14 | `watchdog` for file watching, with a slow polling safety net |
+| 9 | Honeypots in v1 (2.11, #21): hidden AI-aimed instructions that ask for a marker; flagged when the marker appears in text the student added, ignoring whitespace; a flag, never a finding |
 | 19 | The log records each code cell's language: the notebook's language on open plus an event when it changes, with cell magics read from the source (task 5.5, #55); waits on monorepo request 9 |
 | 17 | The server reports disk changes through Jupyter Server's event stream, not polling |
 | 16 | Approved dependencies: `watchdog`, `@jupyterlab/statusbar`, `@jupyterlab/apputils` (#54) |
@@ -114,7 +115,6 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | # | Decision | Recommendation |
 | --- | --- | --- |
 | **18** | **Several browser tabs on one assignment: needs the project lead. Blocks 6.1, 7.3, 7.5 and 7.6** | One tab owns the session, the others forward their events to it. See "Several tabs" in `docs/team-tasks.md` (#32) |
-| 9 | Honeypot matching: in v1, analyzer side (2.11, #21). Still open: what counts as a match, what a honeypot is, and whether it fits PRD NG5 | Ask the project lead and the monorepo owner (request 8) |
 | 5 | Fix VS Code's own notebook gap | Separate work; blocks nothing here |
 
 ## Questions
