@@ -59,7 +59,7 @@ before the format is finalized.
 | Case | Problem | Recommendation |
 | --- | --- | --- |
 | Notebooks older than format 4.5 | They have no cell ids, which the view requires | **Decided (2026-11-13): a hard limit.** Provenance supports nbformat 4.5 or later only; staff control this when creating assignments |
-| A cell containing a line like `# %% [code] id=x` | It looks like a cell boundary. With the JupyterLab viewer (request 5), the analyzer would split that cell in two | Hashes are unaffected. The view parser must split only on headers whose id is a known cell id, or the projection must make headers unambiguous. Decide before the format is pinned |
+| A cell containing a line like `# %% [code] id=x` | It looks like a cell boundary. With the JupyterLab viewer (request 5), the analyzer would split that cell in two | **Decided (2026-11-13): no escaping.** Hashes are unaffected, since both sides build the same text. The view parser treats only lines that exactly match the header format as headers; in the rare case of a lookalike line, the viewer may show one cell as two. Escaping would make the logged text differ from what the student typed and turn single keystrokes into extra edits |
 | `\r\n` inside a cell | Line endings produce different hashes for the same text | Convert to `\n` inside the projection function |
 
 **Approval needed:** the three answers above, or better ones.
