@@ -19,6 +19,7 @@ students use the recorder.
 | 8 | Honeypot detection in the analyzer | New heuristic | v1 |
 | 9 | Each code cell's language in the log | Format change | Task 5.5; the viewer falls back to Python until then |
 | 10 | Possible Windows bug in the VS Code recorder's `extension_hash` | Question, possible bug fix | Not blocking `provjup`; affects VS Code students on Windows |
+| 11 | Put `provjup` on the `/architecture` page | Docs (diagrams and node details) | Before students use the recorder |
 
 `HostInfo.editor` gaining `'jupyterlab'` is already approved and is not repeated here.
 
@@ -301,6 +302,26 @@ a local checkout) could be packaged.
    releases only.
 3. Separately, `localeCompare` depends on the ICU version and locale. Is that acceptable for
    VS Code, given that `provjup` pins byte order (request 3)?
+
+## 11. Put `provjup` on the `/architecture` page
+
+**Why:** the monorepo's `CLAUDE.md` requires `/architecture` to be updated whenever a
+recorder's activation, signal capture or failure handling changes. `provjup` PRs #5, #6
+and #48 do that, but the page still shows the JupyterLab recorder only as a roadmap idea.
+No code change: diagram sources, regenerated SVGs and node details. Task 2.9 (#19).
+
+| Diagram | Today | Change |
+| --- | --- | --- |
+| `ecosystem.dot` | provjet is REPO 2, provnvim REPO 3; no `provjup` | A `provjup` cluster: imports log-core through the `vendor/provenance` submodule with **no port**, a TypeScript frontend that records and a Python server extension that only moves bytes; adds its tree hash to the allowlist; its own end-to-end gate (planned) |
+| `roadmap.dot` | `jupyter`: a future "fourth host", reached by "port core/, re-derive the wiring, pass the vectors" | In development; imports log-core instead of porting it |
+| `master.dot` | `edt`: "VS Code · JetBrains · Neovim" | Add JupyterLab |
+| `recorder.dot` | The host layer names VS Code, IntelliJ and Neovim | Leave until `provjup`'s paste, filesystem, terminal and git signals exist (tasks 6 and 8) |
+
+Each new or renamed node needs its detail in `content/nodes/<diagram>.ts`, or
+`nodes.coverage.test.ts` fails. Regenerating the SVGs needs Graphviz.
+
+**Question for the owner:** do you want this from us, through a fork and a pull request, or
+will you make it yourself?
 
 ## Related, not requested yet
 
