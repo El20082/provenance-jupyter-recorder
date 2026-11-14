@@ -74,7 +74,7 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | # | Blocker | Who | Effect until resolved |
 | --- | --- | --- | --- |
 | B1 | Approve the `view` field and the `ipynb-source-v1` format | Monorepo owner | The analyzer treats a notebook as a plain file; not usable by students |
-| B2 | Settle text-view edge cases. **Decided:** nbformat 4.5 or later is a hard limit; lookalike header lines are not escaped (the viewer may rarely split a cell). Still open: `\r\n` in cells | Monorepo owner, then you | Notebooks without cell ids are not recorded at all |
+| B2 | Settle text-view edge cases. **Decided:** nbformat 4.5 or later is a hard limit; lookalike header lines are not escaped (the viewer may rarely split a cell). `\r\n` in cells: tested in real JupyterLab; recommended no conversion (request 2), awaiting your approval | Monorepo owner, then you | Notebooks without cell ids are not recorded at all |
 | B3 | Decision 7: shared VS Code helpers | You | **Resolved 2026-11-13 (option D):** imported from the submodule like log-core (#52) |
 | B4 | Confirm the JupyterLab packages added for the build | You | **Resolved 2026-11-13:** all confirmed (`application`, `builder`, `services`, `coreutils`, `notebook`, `fileeditor`, and the Python build tools) |
 | B5 | `style/` | You | **Resolved 2026-11-13:** `style/`, the unused settings schema and `ui-tests/` removed (#53) |

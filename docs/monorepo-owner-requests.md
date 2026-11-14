@@ -60,9 +60,27 @@ before the format is finalized.
 | --- | --- | --- |
 | Notebooks older than format 4.5 | They have no cell ids, which the view requires | **Decided (2026-11-13): a hard limit.** Provenance supports nbformat 4.5 or later only; staff control this when creating assignments |
 | A cell containing a line like `# %% [code] id=x` | It looks like a cell boundary. With the JupyterLab viewer (request 5), the analyzer would split that cell in two | **Decided (2026-11-13): no escaping.** Hashes are unaffected, since both sides build the same text. The view parser treats only lines that exactly match the header format as headers; in the rare case of a lookalike line, the viewer may show one cell as two. Escaping would make the logged text differ from what the student typed and turn single keystrokes into extra edits |
-| `\r\n` inside a cell | Line endings produce different hashes for the same text | Convert to `\n` inside the projection function |
+| `\r\n` inside a cell | Line endings produce different hashes for the same text | **Tested 2026-11-13 (see below). Recommended: no conversion.** Keep `\r` as an ordinary character, and split lines only on `\n`, which is what `analysis-core`'s `applyDocChange` already does. Pin it with a vector containing `\r\n` and a lone `\r` |
 
 **Approval needed:** the three answers above, or better ones.
+
+**Line-ending test (2026-11-13, JupyterLab 4.5.0, no real-time collaboration).** A notebook whose
+cells contained `\r\n` and a lone `\r` was opened, saved, edited by real key input and saved
+again, with `provjup` recording:
+
+- JupyterLab's notebook model keeps every `\r`, and saving writes them back unchanged.
+- The editor drops them, so the student sees plain lines.
+- **Typing in such a cell corrupts it.** The editor applies each edit at its own offset, which is
+  one character off for every `\r` before the cursor. The student saw `w = 4 # edited` and
+  `v = 5`; the file got `w =  # edited` and `v = 54`. This is JupyterLab's bug, open upstream as
+  jupyterlab/jupyterlab#14715 (reported there for files with collaboration on; this test shows it
+  in notebook cells without it).
+- **`provjup` recorded it faithfully.** The chain validates, replaying the log reproduces the saved
+  file exactly, and both save hashes match. The log holds what was saved, which is what is graded.
+
+So converting line endings would make the log differ from the saved file for no gain. The real
+risk is upstream: a starter notebook with `\r\n` in its cells corrupts students' edits. Staff
+should make sure distributed notebooks use `\n` only (staff guide, task 9.6).
 
 ## 3. `extension_hash` vectors
 
