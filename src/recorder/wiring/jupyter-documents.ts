@@ -20,6 +20,7 @@
 
 import type { CellType, CellSource } from '../../notebook/text-view';
 import { normalizeDelta } from '../events/doc-events';
+import { untimed, type TimeKeystroke } from '../perf/keystroke-timing';
 import type { RecordingSession } from '../session/recording-session';
 import { routePath, type Route } from '../session/session-router';
 
@@ -75,6 +76,8 @@ export interface JupyterDocumentsDeps {
   editors: TrackerLike<DocumentWidgetLike<SharedFileLike>>;
   /** The file's text as saved on disk, or `null` if it could not be read. */
   readSavedText: (serverPath: string) => Promise<string | null>;
+  /** Wraps each keystroke handler; times it only for the browser check. Default: untimed. */
+  timeKeystroke?: TimeKeystroke;
 }
 
 export interface Disposable {
@@ -132,6 +135,7 @@ function recordNotebook(
   shared: SharedNotebookLike,
   context: DocumentContextLike<SharedNotebookLike>,
   readSavedText: JupyterDocumentsDeps['readSavedText'],
+  time: TimeKeystroke,
 ): DocumentRecorder | null {
   const wiring = route.session.notebooks;
   const cells = snapshotCells(shared);
@@ -142,8 +146,9 @@ function recordNotebook(
     if (cellSlots.has(cell)) return;
     const id = cell.id;
     const slot = (_: unknown, change: { sourceChange?: unknown }): void => {
-      if (change.sourceChange === undefined || change.sourceChange === null) return;
-      wiring.sourceChanged(route.path, id, normalizeDelta(change.sourceChange), cell.getSource());
+      const delta = change.sourceChange;
+      if (delta === undefined || delta === null) return;
+      time(() => wiring.sourceChanged(route.path, id, normalizeDelta(delta), cell.getSource()));
     };
     cell.changed.connect(slot);
     cellSlots.set(cell, slot);
@@ -191,6 +196,7 @@ function recordFile(
   shared: SharedFileLike,
   context: DocumentContextLike<SharedFileLike>,
   readSavedText: JupyterDocumentsDeps['readSavedText'],
+  time: TimeKeystroke,
 ): DocumentRecorder | null {
   const wiring = route.session.files;
   const initial = shared.getSource();
@@ -200,9 +206,11 @@ function recordFile(
   const onChanged = (_: unknown, change: unknown): void => {
     const delta = sourceChangeOf(change);
     if (delta === undefined) return;
-    const current = shared.getSource();
-    if (typeof current !== 'string') return;
-    wiring.sourceChanged(route.path, normalizeDelta(delta), current);
+    time(() => {
+      const current = shared.getSource();
+      if (typeof current !== 'string') return;
+      wiring.sourceChanged(route.path, normalizeDelta(delta), current);
+    });
   };
   shared.changed.connect(onChanged);
 
@@ -291,16 +299,17 @@ class ContextRecorders<M> {
 }
 
 export function connectJupyterDocuments(deps: JupyterDocumentsDeps): Disposable {
+  const time = deps.timeKeystroke ?? untimed;
   const notebooks = new ContextRecorders<SharedNotebookLike>((context, shared) => {
     const route = routePath(context.path, deps.sessions());
     if (route === null) return null;
-    return recordNotebook(route, context.path, shared, context, deps.readSavedText);
+    return recordNotebook(route, context.path, shared, context, deps.readSavedText, time);
   });
   const files = new ContextRecorders<SharedFileLike>((context, shared) => {
     if (isNotebookPath(context.path)) return null;
     const route = routePath(context.path, deps.sessions());
     if (route === null) return null;
-    return recordFile(route, context.path, shared, context, deps.readSavedText);
+    return recordFile(route, context.path, shared, context, deps.readSavedText, time);
   });
 
   const onNotebookAdded = (_: unknown, widget: DocumentWidgetLike<SharedNotebookLike>): void =>
