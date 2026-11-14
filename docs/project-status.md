@@ -116,7 +116,6 @@ Merge in order. Each targets the one before it; avoid squash or rebase merges.
 | **18** | **Several browser tabs on one assignment: needs the project lead. Blocks 6.1, 7.3, 7.5 and 7.6** | One tab owns the session, the others forward their events to it. See "Several tabs" in `docs/team-tasks.md` (#32) |
 | 9 | Honeypot matching: in v1, analyzer side (2.11, #21). Still open: what counts as a match, what a honeypot is, and whether it fits PRD NG5 | Ask the project lead and the monorepo owner (request 8) |
 | 5 | Fix VS Code's own notebook gap | Separate work; blocks nothing here |
-| — | `NOTICE` copyright holder | Your call |
 
 ## Questions
 
