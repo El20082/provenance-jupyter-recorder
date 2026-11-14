@@ -70,8 +70,10 @@ merges. #2 is merged, and #3 and #4 were merged into the stack.
 
 ### Outreach and setup
 
-- [ ] Merge PRs #2 to #5.
+- [ ] Merge the code stack (#5, #6, #48, #53, #54, in order) and the decisions PR (#50).
 - [ ] Send [`monorepo-owner-requests.md`](monorepo-owner-requests.md) to the monorepo owner.
+- [ ] Ask the project lead about decision 18 (several tabs), and to confirm the line-ending
+  finding against jupyterlab/jupyterlab#14715.
 - [ ] Email Data 100 at `data100.instructors@berkeley.edu`.
 - [ ] Find contacts for Data 101 and Data 102.
 - [ ] Ask DataHub support the questions below.
@@ -134,6 +136,12 @@ merges. #2 is merged, and #3 and #4 were merged into the stack.
 4. Teachers and TAs can open student servers, so they could read a student's identity file. Is that acceptable?
 5. Can `provjup` be added to the course image?
 6. Data 101 only: how much work happens in notebooks?
+7. Are any assignments already using hidden instructions aimed at AI tools (honeypots)? Could
+   we see examples, and is "the marker appears, ignoring whitespace" the right match rule?
+8. How are distributed notebooks produced (Otter Assign, on which operating system)?
+   Provenance needs nbformat 4.5 or later and `\n` line endings: JupyterLab misplaces
+   students' edits in cells containing Windows `\r\n`.
+9. Is `jupyter-collaboration` installed in the course image? Recording requires it off for v1.
 
 ### For DataHub support
 
@@ -144,15 +152,14 @@ merges. #2 is merged, and #3 and #4 were merged into the stack.
 
 ### For the monorepo owner
 
-The four requests in [`monorepo-owner-requests.md`](monorepo-owner-requests.md):
-notebook format additions, text-view edge cases, `extension_hash` vectors, and the secret rule
-wording. The owner also needs to say how a `provjup` release hash reaches the allowlist.
+Requests 1 to 10 in [`monorepo-owner-requests.md`](monorepo-owner-requests.md), plus B7
+(`'jupyterlab'` in `HostInfo.editor`). Epic #10 groups them by package. Requests 2, 3, 4, 8
+and 9 already carry the project owner's decisions; the owner approves or answers the rest.
 
 ### Not yet verified
 
 - The extension on JupyterLab 4.4.5, which Data 101 and 102 run.
 - More than one browser tab on the same notebook: each tab starts its own session until Task 7.
-- That JupyterLab reports cell edits in the format the notebook code expects. Checked in Task 4.
 - A real Otter export reaching Gradescope with `.provenance/` intact.
 - `watchdog` notification speed on DataHub's NFS home directories. Checked in Task 6.
 - Heartbeats in hidden browser tabs, and whether they keep idle servers alive. Checked in Task 6.

@@ -488,11 +488,12 @@ These are for the project owner, but anyone can help draft them.
 
 | Item | Status |
 | --- | --- |
-| Send [`monorepo-owner-requests.md`](monorepo-owner-requests.md); also ask about B7 (`'jupyterlab'` in `HostInfo.editor`) and Task 2 as a whole | Not sent |
+| Send [`monorepo-owner-requests.md`](monorepo-owner-requests.md) (requests 1 to 10); also ask about B7 (`'jupyterlab'` in `HostInfo.editor`) and Task 2 as a whole (epic #10) | Not sent |
+| Ask the project lead about decision 18 (several tabs) and the line-ending finding | Not sent |
 | Email Data 100 at `data100.instructors@berkeley.edu` (questions in `project-status.md`) | Not sent |
 | Find contacts for Data 101 and 102 | Not started |
 | Ask DataHub support: course images, whether `~/.local/share/jupyter` persists, staff role scope, and adding `watchdog` to the images | Not sent |
-| Merge PRs #2 to #6 | Waiting on review |
+| Merge the code stack (#5, #6, #48, #53, #54) and the decisions PR (#50) | Waiting on review |
 
 ## Open issues and decisions
 
